@@ -1,0 +1,45 @@
+byr:1919 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:2003 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2009 eyr:2021 hgt:158cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2021 eyr:2021 hgt:158cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2019 hgt:158cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2031 hgt:158cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:149cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:194cm hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:58in hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:77in hcl:#b6652a ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652 ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652fa ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652g ecl:blu pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652a ecl:ble pid:093154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652a ecl:blu pid:0930154719
+
+byr:1944 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652a ecl:blu pid:09314719
+
+byr:1944 iyr:2010 eyr:2021 hgt:158cm hcl:#b6652a
+ecl:blu pid:093154719
+
+byr:1944 iyr:2010 pid:093154719 eyr:2021 hgt:158cm hcl:#b6652a ecl:blu 
+
+byr:1944 iyr:2010 pid:093154719 eyr:2021 hgt:158cm ecl:blu hcl:#b6652a
+
+
+byr:1944 iyr:2010 pid:093154719
+eyr:2021 hgt:158cm hcl:#b6652a
+ecl:blu
+
+
