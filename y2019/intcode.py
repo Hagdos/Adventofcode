@@ -10,7 +10,7 @@ def codetomem(code):
 # =============================================================================
 # Main intcode loop: Run code
 # =============================================================================
-def runintcode(mem):
+def runintcode(mem, inputs):
     ip = 0
     counter = 0
     while True:
@@ -41,7 +41,7 @@ def runintcode(mem):
             mem, ip = equals(mem, ip, mode)
         elif instr == 99:
             break
-    return mem
+    return mem, output
 
 # =============================================================================
 # Instructions
