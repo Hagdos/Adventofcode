@@ -13,6 +13,8 @@ def codetomem(code):
 def runintcode(mem, inputs):
     ip = 0
     counter = 0
+    inputcounter = 0
+    outputs = []
     while True:
         counter += 1
         if counter >= 1000:
@@ -23,14 +25,25 @@ def runintcode(mem, inputs):
         mode = mem[ip]//100         #Floor division; remove first two characters
         # print(instr,mode)
         # print()
+        
+# =============================================================================
+#         Instructions switchcase
+# =============================================================================
         if instr == 1:
             mem, ip = add(mem, ip, mode)
         elif instr == 2:
             mem, ip = multiply(mem, ip, mode)
         elif instr == 3:
-            mem, ip = inp(mem, ip)
+            try:
+                value = inputs[inputcounter]
+            except:
+                print("Too few inputs provided, at least", inputcounter+1, "inputs needed")
+                break
+            inputcounter += 1
+            mem, ip = inp(mem, ip, value)
         elif instr == 4:
-            mem, ip = outp(mem, ip, mode)
+            mem, ip, output = outp(mem, ip, mode)
+            outputs.append(output)
         elif instr == 5:
             mem, ip = jmpiftrue(mem, ip, mode)
         elif instr == 6:
@@ -41,7 +54,8 @@ def runintcode(mem, inputs):
             mem, ip = equals(mem, ip, mode)
         elif instr == 99:
             break
-    return mem, output
+        
+    return mem, outputs
 
 # =============================================================================
 # Instructions
@@ -62,17 +76,18 @@ def multiply(mem, ip, mode):
     return mem, ip
 
 #Instruction 3, input
-def inp(mem, ip):
-    mem[mem[ip+1]] = int(input("Please provide input: "))
+def inp(mem, ip, value):
+    # mem[mem[ip+1]] = int(input("Please provide input: "))
+    mem[mem[ip+1]] = value
     ip += 2
     return mem, ip
     
 #Instruction 4, output
 def outp(mem, ip, mode):
     a = read1var(mem, ip, mode)
-    print('Output: ', a)
+    # print('Output: ', a)
     ip += 2
-    return mem, ip
+    return mem, ip, a
 
 #Instruction 5, Jump if first parameter is non-zero
 def jmpiftrue(mem,ip,mode):
@@ -140,5 +155,5 @@ def read2var(mem, ip, mode):
 if __name__ == "__main__":
     # print("Use F6, you idiot")
     testmem = codetomem('3,3,1108,-1,8,3,4,3,99'.split(','))
-    runintcode(testmem)
+    runintcode(testmem, [1])
 
