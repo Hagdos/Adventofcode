@@ -9,17 +9,19 @@ def codetomem(code):
 
 # =============================================================================
 # Main intcode loop: Run code
+# counters = [ip, relbase, inputcounter, loopcounter]
 # =============================================================================
-def runintcode(mem, inputs):
-    ip = 0
-    counter = 0
-    inputcounter = 0
-    relbase = 0
+def runintcode(mem, inputs, counters):
+    ip = counters[0]
+    relbase = counters[1]
+    inputcounter = counters[2]
+    loopcounter = counters[3]
     outputs = []
+    finished = False
     while True:
-        counter += 1
-        if counter >= 1000000:
-            print("Program ran for", counter, "cycles")
+        loopcounter += 1
+        if loopcounter >= 1000000:
+            print("Program ran for", loopcounter, "cycles")
             break
         # print('IP = ', ip)
         instr = mem[ip]%100         #First two characters are opcode 
@@ -38,7 +40,7 @@ def runintcode(mem, inputs):
             try:
                 value = inputs[inputcounter]
             except:
-                print("Too few inputs provided, at least", inputcounter+1, "inputs needed")
+                # print("Too few inputs provided, at least", inputcounter+1, "inputs needed")
                 break
             inputcounter += 1
             mem, ip = inp(mem, ip, mode, value, relbase)
@@ -56,9 +58,10 @@ def runintcode(mem, inputs):
         elif instr == 9:
             mem, ip, relbase = adjbase(mem,ip, mode, relbase)
         elif instr == 99:
+            finished = True
             break
-        
-    return mem, outputs
+    
+    return mem, outputs, [ip, relbase, inputcounter, loopcounter], finished
 
 # =============================================================================
 # Instructions
