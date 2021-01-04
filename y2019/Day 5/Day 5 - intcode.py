@@ -8,11 +8,11 @@ f = open('code.txt')
 code = f.readline().strip().split(',')
 
 mem = ic.codetomem(code)
-mem, ans = ic.runintcode(mem, [1])
+mem, ans, counters, finished = ic.runintcode(mem, [1])
 
-print("Answer Part 1:", ans)
+print("Answer Part 1:", ans[-1])
 
 mem = ic.codetomem(code)
-mem, ans = ic.runintcode(mem, [5])
+mem, ans, counters, finished = ic.runintcode(mem, [5])
 
 print("Answer Part 2:", ans)

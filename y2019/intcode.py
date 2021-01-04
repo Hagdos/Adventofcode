@@ -11,7 +11,7 @@ def codetomem(code):
 # Main intcode loop: Run code
 # counters = [ip, relbase, inputcounter, loopcounter]
 # =============================================================================
-def runintcode(mem, inputs, counters):
+def runintcode(mem, inputs, counters=[0,0,0,0]):
     ip = counters[0]
     relbase = counters[1]
     inputcounter = counters[2]
