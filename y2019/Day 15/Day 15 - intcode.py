@@ -12,8 +12,10 @@ class Game(QWidget):
         QWidget.__init__(self)
         #Dictionary of blocks. 0 is a wall, 1 is an open space, 2 is oxygenthing, 3 is a deadendpath, 4 is a path after finding
         self.blocks = {}
-        self.timestep = 0         #Time between steps
+        self.timestep = 1         #Time between steps
         self.bs = 20                #Blocksize
+        self.directions = [(1, 0, -1), (2, 0, 1), (3, -1, 0), (4, 1, 0)]
+        self.directions.reverse()
         self.userx = 25
         self.usery = 25
         self.initx = self.userx
@@ -29,6 +31,7 @@ class Game(QWidget):
         self.setGeometry(0, 30, self.bs*50, self.bs*50)
         self.clockinit()
         self.steps = 0
+        self.minutes = 0
    
     def clockinit(self):
         self.timer = QTimer()
@@ -36,43 +39,72 @@ class Game(QWidget):
         self.timer.start(self.timestep)        
             
     def playgame(self):
-        i = 0
-        if not self.finished and i<10:
-            i+=1
+        if not self.finished:
             self.determineInput()
             #Run the game
             if not self.finished:
                 self.mem, self.outputs, self.counters, self.finished = ic.runintcode(self.mem, self.inputs, self.counters)  
             self.handleOutput()
+            
+    def fillOxygenInit(self):
+        self.userx = self.oxygenLocation[0]
+        self.usery = self.oxygenLocation[1]
+        self.timestep = 10
+        self.timer.timeout.disconnect(self.playgame)
+        self.timer.timeout.connect(self.fillOxygen)
+        self.timer.start(self.timestep)
+        
+    def fillOxygen(self):
+        self.finished = True
+        for block in self.blocks:
+            if self.blocks[block] == 2:
+                for (direction, dx, dy) in self.directions:
+                    if self.blocks[(block[0]+dx, block[1]+dy)] == 3:
+                        self.finished = False
+                        self.blocks[(block[0]+dx, block[1]+dy)] = 5
+        for block in self.blocks:
+            if self.blocks[block] == 5: 
+                self.blocks[block] = 2
+        if self.finished:
+            self.timer.stop()
+        else:
+            self.minutes += 1
+            self.update()
+
                             
     def determineInput(self):
         keys = self.blocks.keys()
         self.newx = self.userx
         self.newy = self.usery        
         self.newinput = 0
-        for i, (dx, dy) in enumerate([(0, -1), (0, 1), (-1, 0), (1, 0)]):
+        for (direction, dx, dy) in self.directions:
             if (self.userx+dx, self.usery+dy) not in keys:
-                self.newinput  = i+1
+                self.newinput  = direction
                 self.newx += dx                
                 self.newy += dy
                 break
         if self.newinput == 0:
-            for i, (dx, dy) in enumerate([(0, -1), (0, 1), (-1, 0), (1, 0)]):
-                if self.blocks[(self.userx+dx, self.usery+dy)] not in [0,3,4]:
+            for (direction, dx, dy) in self.directions:
+                if self.blocks[(self.userx+dx, self.usery+dy)] == 1:
                     if self.found:
-                        self.blocks[(self.userx, self.usery)] = 4
+                        if not self.blocks[(self.userx, self.usery)] == 2:
+                            self.blocks[(self.userx, self.usery)] = 3
+                            # self.blocks[(self.userx, self.usery)] = 3                        
                     else:
                         self.blocks[(self.userx, self.usery)] = 3
-                    self.newinput  = i+1
+                    self.newinput  = direction
                     self.newx += dx                
                     self.newy += dy
                     break
            
         if self.newinput  == 0:
-            print("Stuck!")
+            print("Mapped!")
             self.finished = True
             self.found = False
             self.newinput = 1
+            self.timer.stop()
+            self.fillOxygenInit()
+            self.update()
         self.inputs.append(self.newinput)
   
         
@@ -84,9 +116,9 @@ class Game(QWidget):
         elif self.outputs[-1] == 2:
             self.userx = self.newx
             self.usery = self.newy
-            print("Ogygen System found!")
+            print("Oxygen System found!")
             self.oxygenLocation = (self.userx, self.usery)
-            self.finished = True
+            # self.finished = True
             self.found = True
         self.update()    
                
@@ -95,8 +127,9 @@ class Game(QWidget):
         qp.begin(self)
         self.drawWalls(qp)
         self.drawUser(qp)
-        if self.finished:
-            self.drawWinText(qp)
+        self.drawMinutes(qp)
+        # if self.finished:
+        #     self.drawWinText(qp)
         qp.end()
         
     def keyPressEvent(self, keyEvent):
@@ -153,24 +186,33 @@ class Game(QWidget):
                 brush = QBrush(Qt.Dense4Pattern)
                 brush.setColor(QColor("Red"))
                 qp.setBrush(brush)
+            if self.blocks[block] == 4:
+                brush = QBrush(Qt.Dense4Pattern)
+                brush.setColor(QColor("Green"))
+                qp.setBrush(brush)
             qp.drawRect(block[0]*self.bs, block[1]*self.bs, self.bs, self.bs)    
 
     def drawUser(self, qp):
         qp.setBrush(QBrush(Qt.DiagCrossPattern))
         qp.drawRect(self.userx*self.bs, self.usery*self.bs, self.bs, self.bs)
         
+        
+    def drawMinutes(self, qp):
+        qp.setFont(QFont('Decorative', self.bs))
+        qp.drawText(0, 47*self.bs, "Minutes passed: {}".format(self.minutes)) 
+        
     def drawWinText(self, qp):
         qp.setPen(QColor("Red"))
-        qp.setFont(QFont('Decorative', 50))
+        qp.setFont(QFont('Decorative', 30))
         if self.found:
-            qp.drawText(500, 500, "Oxygen system found! Location {} {}".format(self.userx-self.initx, self.usery-self.inity))  
+            qp.drawText(250, 500, "Oxygen system found! Location ({}, {})".format(self.userx-self.initx, self.usery-self.inity))  
             ans = 0    #minus one to account for the starting position
             for loc in self.blocks:
                 if self.blocks[loc] == 1:
                     ans+=1
             print("Answer to part 1:", ans)
         else:
-            qp.drawText(500, 500, "Got stuck")  
+            qp.drawText(250, 500, "Mapping finished")  
             
             
 f = open('code.txt')
@@ -180,6 +222,3 @@ mem = ic.codetomem(code)
 app = QApplication([])  
 GUI = Game(mem)
 sysExit(app.exec_())
-
-#232 is too high, 231 ook
-#226
