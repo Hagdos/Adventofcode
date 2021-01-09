@@ -10,15 +10,15 @@ from PyQt5.QtWidgets import QApplication, QWidget
 class Game(QWidget):
     def __init__(self, mem):
         QWidget.__init__(self)
-        self.walls = []
-        self.path = []
-        self.foundblocks = []
+        #Dictionary of blocks. 0 is a wall, 1 is an open space, 2 is oxygenthing, 3 is a deadendpath, 4 is a path after finding
+        self.blocks = {}
         self.timestep = 0         #Time between steps
         self.bs = 20                #Blocksize
         self.userx = 25
         self.usery = 25
         self.initx = self.userx
         self.inity = self.usery
+        self.blocks[self.userx, self.usery] = 1
         self.show()
         self.mem = mem
         self.counters = [0, 0, 0, 0]
@@ -46,22 +46,23 @@ class Game(QWidget):
             self.handleOutput()
                             
     def determineInput(self):
+        keys = self.blocks.keys()
         self.newx = self.userx
         self.newy = self.usery        
         self.newinput = 0
-        #TODO: Walk back over path if no unblocked path found
-        for i, (dx, dy) in enumerate([(0, -1), (0, 1), (-1, 0), (1, 0)]): 
-            if (self.userx+dx, self.usery+dy) not in self.walls+self.path:
+        for i, (dx, dy) in enumerate([(0, -1), (0, 1), (-1, 0), (1, 0)]):
+            if (self.userx+dx, self.usery+dy) not in keys:
                 self.newinput  = i+1
                 self.newx += dx                
                 self.newy += dy
                 break
         if self.newinput == 0:
-            for i, (dx, dy) in enumerate([(0, -1), (0, 1), (-1, 0), (1, 0)]): 
-                if (self.userx+dx, self.usery+dy) not in self.walls:
+            for i, (dx, dy) in enumerate([(0, -1), (0, 1), (-1, 0), (1, 0)]):
+                if self.blocks[(self.userx+dx, self.usery+dy)] not in [0,3,4]:
                     if self.found:
-                        self.foundblocks.append((self.userx, self.usery))
-                    self.walls.append((self.userx, self.usery))
+                        self.blocks[(self.userx, self.usery)] = 4
+                    else:
+                        self.blocks[(self.userx, self.usery)] = 3
                     self.newinput  = i+1
                     self.newx += dx                
                     self.newy += dy
@@ -76,16 +77,11 @@ class Game(QWidget):
   
         
     def handleOutput(self):
-        if self.outputs[-1] == 0:
-            self.walls.append((self.newx, self.newy))
-            # print("Wall")
-        elif self.outputs[-1] == 1:
-            self.path.append((self.userx, self.usery))
+        self.blocks[(self.newx, self.newy)] = self.outputs[-1]
+        if self.outputs[-1] == 1:
             self.userx = self.newx
             self.usery = self.newy
-            # print("Move")
         elif self.outputs[-1] == 2:
-            self.path.append((self.userx, self.usery))
             self.userx = self.newx
             self.usery = self.newy
             print("Ogygen System found!")
@@ -98,9 +94,6 @@ class Game(QWidget):
         qp = QPainter()
         qp.begin(self)
         self.drawWalls(qp)
-        self.drawPath(qp)
-        self.drawFoundPath(qp)
-        self.drawOxygen(qp)
         self.drawUser(qp)
         if self.finished:
             self.drawWinText(qp)
@@ -144,51 +137,36 @@ class Game(QWidget):
                 self.newx += 1
             self.mem, self.outputs, self.counters, self.finished = ic.runintcode(self.mem, self.inputs, self.counters)
             self.handleOutput()   
-        print(self.steps)
+            print(self.steps)
        
     def drawWalls(self, qp):
-        qp.setBrush(QBrush(Qt.SolidPattern))
-        for wall in self.walls:
-            if wall not in self.path:
-                qp.drawRect(wall[0]*self.bs, wall[1]*self.bs, self.bs, self.bs)
-            
-    def drawPath(self, qp):
-        qp.setBrush(QBrush(Qt.Dense7Pattern))
-        for pos in self.path:
-            if pos not in self.walls:
-                qp.drawRect(pos[0]*self.bs, pos[1]*self.bs, self.bs, self.bs)
-            
-    def drawFoundPath(self, qp):
-        brush = QBrush(Qt.Dense4Pattern)
-        brush.setColor(QColor("Red"))
-        qp.setBrush(brush)
-        for pos in self.path:
-            if pos in self.walls:
-                qp.drawRect(pos[0]*self.bs, pos[1]*self.bs, self.bs, self.bs)
-        brush.setColor(QColor("Green"))
-        qp.setBrush(brush)
-        for pos in self.foundblocks:
-            qp.drawRect(pos[0]*self.bs, pos[1]*self.bs, self.bs, self.bs)
-    
+        for block in self.blocks:
+            if self.blocks[block] == 0:
+                qp.setBrush(QBrush(Qt.SolidPattern))
+            if self.blocks[block] == 1:
+                qp.setBrush(QBrush(Qt.Dense7Pattern))
+            if self.blocks[block] == 2:
+                brush = QBrush(Qt.Dense1Pattern)
+                brush.setColor(QColor("Green"))
+                qp.setBrush(brush)
+            if self.blocks[block] == 3:
+                brush = QBrush(Qt.Dense4Pattern)
+                brush.setColor(QColor("Red"))
+                qp.setBrush(brush)
+            qp.drawRect(block[0]*self.bs, block[1]*self.bs, self.bs, self.bs)    
+
     def drawUser(self, qp):
         qp.setBrush(QBrush(Qt.DiagCrossPattern))
         qp.drawRect(self.userx*self.bs, self.usery*self.bs, self.bs, self.bs)
-        
-    def drawOxygen(self, qp):
-        if self.found:
-            brush = QBrush(Qt.Dense1Pattern)
-            brush.setColor(QColor("Green"))
-            qp.setBrush(brush)
-            qp.drawRect(self.oxygenLocation[0]*self.bs, self.oxygenLocation[1]*self.bs, self.bs, self.bs)
         
     def drawWinText(self, qp):
         qp.setPen(QColor("Red"))
         qp.setFont(QFont('Decorative', 50))
         if self.found:
             qp.drawText(500, 500, "Oxygen system found! Location {} {}".format(self.userx-self.initx, self.usery-self.inity))  
-            ans = -1    #minus one to account for the starting position
-            for loc in self.path:
-                if loc not in self.walls:
+            ans = 0    #minus one to account for the starting position
+            for loc in self.blocks:
+                if self.blocks[loc] == 1:
                     ans+=1
             print("Answer to part 1:", ans)
         else:
