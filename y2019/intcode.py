@@ -11,7 +11,7 @@ def codetomem(code):
 # Main intcode loop: Run code
 # counters = [ip, relbase, inputcounter, loopcounter]
 # =============================================================================
-def runintcode(mem, inputs, counters=[0,0,0,0]):
+def runintcode(mem, inputs = [], counters=[0,0,0,0]):
     ip = counters[0]
     relbase = counters[1]
     inputcounter = counters[2]
@@ -20,7 +20,7 @@ def runintcode(mem, inputs, counters=[0,0,0,0]):
     finished = False
     while True:
         loopcounter += 1
-        if loopcounter >= 1000000:
+        if loopcounter >= 100000000:
             print("Program ran for", loopcounter, "cycles")
             break
         # print('IP = ', ip)
