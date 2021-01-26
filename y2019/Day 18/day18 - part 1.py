@@ -19,7 +19,7 @@ def distanceto(point, d, alreadyfound, blockedby, inpath):
 
 
 f = open('cavetest1.txt')
-# f = open('cave.txt')
+f = open('cave.txt')
 cave = []
 for line in f:
     cave.append(line.strip())
@@ -94,7 +94,7 @@ for i in range(40000):
                     if newlength>= paths[p] and all(keys in p for keys in newpath):
                         addpath = False
                         break
-                    if paths[p]>newlength and all(keys in newpath for keys in p):
+                    if paths[p]>=newlength and all(keys in newpath for keys in p):
                         paths.pop(p)
 
                 if addpath:
