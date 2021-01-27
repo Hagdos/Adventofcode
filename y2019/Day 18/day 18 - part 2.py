@@ -19,7 +19,60 @@ def distanceto(point, d, alreadyfound, blockedby, inpath, relevantkeys):
             alreadyfound, blockedby, relevantkeys = distanceto(n,d,alreadyfound, blockedby, inpath.copy(), relevantkeys)
     return alreadyfound, blockedby, relevantkeys
 
+def findshortestpath(paths, relevantkeys, distancetostart):
+    maxpathlength = len(relevantkeys)+1
+    stop = False
+    for i in range(40000):
+        # print(paths)
+        # if not i%100:
+        #     print(i)
+        bestpath = 2**16    #Random "big" number
+        for p in paths:
+            #Best path is shortest path per key
+            if paths[p]//len(p) < bestpath and len(p) < maxpathlength:
+                bestpath = paths[p]//len(p)
+                ps = p
+        if bestpath == 2**16:
+            print("No best path found")
+            #Return error
+            return paths
+        
+        #Add new paths
+        for k in relevantkeys:
+            if k not in ps:     
+                addpath = True
+                newpath = ps + tuple(k)
+                if ps[-1] == '@':
+                    newlength = paths[ps] + distancetostart[keys[k]]
+                else:
+                    newlength = paths[ps] + distancetokey[ps[-1]][keys[k]]
+                for p in list(paths):
+                    if newlength>= paths[p] and all(keys in p for keys in newpath):
+                        addpath = False
+                        break
+                    if paths[p]>=newlength and all(keys in newpath for keys in p):
+                        paths.pop(p)
+
+                if addpath:
+                    paths[newpath] = newlength
+                    # if len(newpath) == maxpathlength:
+                        # print("We reached all numbers!")
+        paths.pop(ps)                
+        if len(paths) == 1 and i>0:
+            for p in paths:
+                if len(p) == maxpathlength:
+                    stop = True
+        if stop:
+            return paths
+
+
+
+# =============================================================================
+# Open file
+# =============================================================================
+
 f = open('cavept2.txt')
+# f = open('cavetest4.txt')
 cave = []
 for line in f:
     cave.append(line.strip())
@@ -61,16 +114,41 @@ for i,s in enumerate(start):
     distancetostart[i], blockedbystart[i], relevantkeys[i] = distanceto(s, 0, {}, {}, set(), set())
 
 
-for i,_ in enumerate(start):
-    for k in relevantkeys[i]:
-        print(k, blockedbystart[i][keys[k]])
-        
-    print()
+paths = []
+paths.append(dict())
+paths[0][tuple('@')] = 0
+paths.append(dict())
+paths[1][tuple('@')] = 0
+paths.append(dict())
+paths[2][tuple('@')] = 0
+# paths[2][('@', 'n')] = distancetostart[2][keys['n']]
+paths.append(dict())
+paths[3][tuple('@')] = 0
     
-for line in cave:
-    if 'v' in line:
-        line = line + " <- This line"
-    print(line)
+
+for i in range(len(start)):
+    paths[i] = findshortestpath(paths[i], relevantkeys[i], distancetostart[i])
+
+ans = 0
+for i in paths:
+    for p in i:
+        print(i[p])
+        ans+= i[p]
+    
+print("Answer to part 2:", ans)
+
+#1796 is too high
+    
+# for i,_ in enumerate(start):
+#     for k in relevantkeys[i]:
+#         print(k, blockedbystart[i][keys[k]])
+#     print()
+        
+#     print()
+# for line in cave:
+#     if 'v' in line:
+#         line = line + " <- This line"
+#     print(line)
 
     
 # Shortest path on part 1: n e u i j w c z k s t o q b a y g f x h m d l v p r 
