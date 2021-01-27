@@ -26,11 +26,13 @@ def findshortestpath(paths, relevantkeys, distancetostart):
         # print(paths)
         # if not i%100:
         #     print(i)
-        bestpath = 2**16    #Random "big" number
+        bestpath = 10**20    #Random "big" number
         for p in paths:
             #Best path is shortest path per key
-            if paths[p]//len(p) < bestpath and len(p) < maxpathlength:
-                bestpath = paths[p]//len(p)
+            if len(p) == 1:
+                ps = p
+            elif paths[p]//(len(p)-1) < bestpath and len(p) < maxpathlength:
+                bestpath = paths[p]//(len(p)-1)
                 ps = p
         if bestpath == 2**16:
             print("No best path found")
@@ -47,10 +49,10 @@ def findshortestpath(paths, relevantkeys, distancetostart):
                 else:
                     newlength = paths[ps] + distancetokey[ps[-1]][keys[k]]
                 for p in list(paths):
-                    if newlength>= paths[p] and all(keys in p for keys in newpath):
+                    if newlength>paths[p] and all(keys in p for keys in newpath):
                         addpath = False
                         break
-                    if paths[p]>=newlength and all(keys in newpath for keys in p):
+                    if paths[p]>newlength and all(keys in newpath for keys in p):
                         paths.pop(p)
 
                 if addpath:
@@ -72,7 +74,7 @@ def findshortestpath(paths, relevantkeys, distancetostart):
 # =============================================================================
 
 f = open('cavept2.txt')
-# f = open('cavetest4.txt')
+# f = open('cavetest5.txt')
 cave = []
 for line in f:
     cave.append(line.strip())
@@ -132,17 +134,18 @@ for i in range(len(start)):
 ans = 0
 for i in paths:
     for p in i:
-        print(i[p])
+        # print(i[p])
         ans+= i[p]
     
 print("Answer to part 2:", ans)
 
 #1796 is too high
+#part 3 seems to be right. Still to check 0, 1 and 2
     
-# for i,_ in enumerate(start):
-#     for k in relevantkeys[i]:
-#         print(k, blockedbystart[i][keys[k]])
-#     print()
+for i,_ in enumerate(start):
+    for k in relevantkeys[i]:
+        print(k, blockedbystart[i][keys[k]])
+    print()
         
 #     print()
 # for line in cave:
@@ -164,3 +167,5 @@ print("Answer to part 2:", ans)
     
     # Possible paths for part 3: [n, s, etc, r], [n, m, s, etc, r]
     # Possible paths for part 4: [etc, p, v], [etc, v, p] (The second one is the only one that makes sense; so we could do a least path ending at v, and add the distance to p or do the least path to p)
+    
+#Technically; my search algorithm is pruning too quickly. Should only prune other paths that are longer or equal and have the same endpoint.

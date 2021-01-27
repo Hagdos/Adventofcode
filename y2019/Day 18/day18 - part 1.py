@@ -59,16 +59,20 @@ distancetostart, blockedbystart = distanceto(start, 0, {}, {}, set())
 # Possible routes
 # =============================================================================
 paths = dict()
-for k in keys:
-    if not blockedbystart[keys[k]]:
-        paths[tuple(k)] = distancetostart[keys[k]]
+paths[tuple('@')] = 0
+# for k in keys:
+#     if not blockedbystart[keys[k]]:
+#         paths[tuple(k)] = distancetostart[keys[k]]
 
 # Find shortest current path.
 s = time.time()
-maxpathlength = len(keys)
+maxpathlength = len(keys)+1
 stop = False
 
-for i in range(40000):
+for i in range(500000):
+    if not i%1000:
+        print(i, len(paths))
+    # print(paths)
     if len(paths) == 1 and i>0:
         for p in paths:
             if len(p) == maxpathlength:
@@ -78,9 +82,11 @@ for i in range(40000):
 
     bestpath = 10**20    #Random "big" number
     for p in paths:
-        #Best path is shortest path per key
-        if paths[p]//len(p) < bestpath and len(p) < maxpathlength:
-            bestpath = paths[p]//len(p)
+        #Best path is shortest path per key. -1 is needed because otherwise it will favour short paths starting with @
+        if len(p) == 1:
+            ps = p
+        elif paths[p]//(len(p)-1) < bestpath and len(p) < maxpathlength:
+            bestpath = paths[p]//(len(p)-1)
             ps = p
     
     #Add new paths
@@ -89,18 +95,30 @@ for i in range(40000):
             if not any(door.lower() not in ps for door in blockedbystart[keys[k]]):
                 addpath = True
                 newpath = ps + tuple(k)
-                newlength = paths[ps] + distancetokey[ps[-1]][keys[k]]
+                if ps[-1] == '@':
+                    newlength = paths[ps] + distancetostart[keys[k]]
+                else:
+                    newlength = paths[ps] + distancetokey[ps[-1]][keys[k]]
+                    
                 for p in list(paths):
-                    if newlength>= paths[p] and all(keys in p for keys in newpath):
-                        addpath = False
-                        break
-                    if paths[p]>=newlength and all(keys in newpath for keys in p):
-                        paths.pop(p)
+                    if p[-1] == k:
+                        if newlength >=paths[p] and all(keys in p for keys in newpath):
+                            addpath = False
+                            break
+                        elif paths[p]>=newlength and all(keys in newpath for keys in p):
+                            paths.pop(p)
+                            break
+                # for p in list(paths):
+                #     if newlength>=paths[p] and all(keys in p for keys in newpath):
+                #         addpath = False
+                #         break
+                #     if paths[p]>=newlength and all(keys in newpath for keys in p):
+                #         paths.pop(p)
 
                 if addpath:
                     paths[newpath] = newlength
-                    if len(newpath) == maxpathlength:
-                        print("We reached all numbers!")
+                    # if len(newpath) == maxpathlength:
+                    #     print("We reached all numbers!")
                 
     paths.pop(ps)
     
