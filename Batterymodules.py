@@ -28,6 +28,9 @@ class GUI(QWidget):
         self.maxPackVolt = QLineEdit()
         self.addrowofinputs([self.maxCellVolt, self.maxPackVolt], ['4.2', '450'])
         
+        
+        #Output table
+        self.addrowoflabels(["Possible options:"])
         self.table = QTableWidget(3, 7)
         self.fillTable()
         
