@@ -1,7 +1,7 @@
 import sys
-from PyQt5.QtCore    import Qt, QTimer
-from PyQt5.QtGui     import QDoubleValidator, QPainter, QColor, QBrush, QFont
-from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QVBoxLayout, QTableWidget, QTableWidgetItem, QLineEdit
+from PyQt5.QtCore    import Qt
+from PyQt5.QtGui     import QDoubleValidator
+from PyQt5.QtWidgets import QApplication, QLabel, QWidget, QGridLayout, QTableWidget, QTableWidgetItem, QLineEdit
 
 class GUI(QWidget):
     def __init__(self):
