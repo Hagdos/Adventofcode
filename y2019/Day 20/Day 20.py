@@ -105,10 +105,18 @@ def distanceto2(point, distance = 0, depth = 0, alreadyfound = {}, foundPortals 
     alreadyfound[(point, depth)] = distance
     distance += 1
     # print(distance)
-    for n in neighbours[point]:
-        # if n in portalLocations.keys():
-        #     print(n)
-        #     foundPortals.append(portalLocations[n])
+    for neighbour in neighbours[point]:
+        if neighbour in innerPortalsLocations.keys() and depth < 4:
+            n = outerPortals[innerPortalsLocations[neighbour]]
+            depth += 1
+            # alreadyfound, foundPortals = distanceto2(outerPortals[innerPortalsLocations[n]], distance, depth+1, alreadyfound, foundPortals)
+        elif neighbour in outerPortalsLocations.keys() and depth > 0:
+            n = innerPortals[outerPortalsLocations[neighbour]]
+            depth -= 1
+            # alreadyfound, foundPortals = distanceto2(innerPortals[outerPortalsLocations[n]], distance, depth-1, alreadyfound, foundPortals)
+        else:
+            n = neighbour
+        
         if (n, depth) in alreadyfound.keys():
             if alreadyfound[(n, depth)] > distance:
                 alreadyfound, foundPortals = distanceto2(n, distance, depth, alreadyfound, foundPortals)
@@ -117,12 +125,9 @@ def distanceto2(point, distance = 0, depth = 0, alreadyfound = {}, foundPortals 
 
     return alreadyfound, foundPortals
 
+#TODO this doesn't work. A better path-finding algorith is needed; start with mapping distances between portals. Similar to day 18
+
 foundPortals = []
 distances, foundPortals = distanceto2(start)
 
-
-#TODO: Change distance2 such that it "teleports" to the location of the portal if it finds one; but adds a third dimension to the location (depth).
-
-# for f in foundPortals:
-#     print(f)
-
+print(distances[end])
