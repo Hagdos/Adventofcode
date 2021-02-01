@@ -9,7 +9,7 @@ class GUI(QWidget):
         self.setWindowTitle('Battery configuration calculator')
         self.layout = QGridLayout()
         self.line = 0
-        self.setGeometry(600,300, 820, 800)
+        self.setGeometry(600,300, 850, 800)
         
         # Input for total number of cells
         self.addrowoflabels(["Minimum number of cells:", "Maximum number of cells:"])
