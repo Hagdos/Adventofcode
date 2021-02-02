@@ -53,7 +53,6 @@ for line in f:
 #                 alreadyfound = distanceto(n,distance,alreadyfound)
 #     except:
 #         print(point)
-            
 #     return alreadyfound
 
 # # distances = distanceto(start)
@@ -63,15 +62,28 @@ for line in f:
 #   ------------------   Part 2   ---------------------------
 # =============================================================================
 
+INNER = -1
+OUTER = 1
+
+#Define a class portals; with a name; a location and an orientation (inner or outer)
+class Portal:
+    def __init__(self, name, location, orientation):
+        self.name = name
+        self.location = location
+        self.orientation = orientation
+        self.mirror = None
+        
+    def __repr__(self):
+        return str(self.name) + ' ' + str(self.orientation)
+
 
 # =============================================================================
 # Find location of all keys; doors; and map the neighbours of each node for the iteration
 # =============================================================================
-innerPortals = {}
-outerPortals = {}
-innerPortalsLocations = {}
-outerPortalsLocations = {}
+portals = []
+portalsLocations = {}
 neighbours = {}
+
 for y,line in enumerate(cave):
     for x,c in enumerate(line):
         if c == '.':
@@ -79,55 +91,156 @@ for y,line in enumerate(cave):
             for dx, dy in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 if cave[y+dy][x+dx] == '.':
                     n.add((x+dx, y+dy))                 
-                elif cave[y+dy][x+dx] == 'A' and cave[y+2*dy][x+2*dx] == 'A':
-                    start = (x, y)
-                elif cave[y+dy][x+dx] == 'Z' and cave[y+2*dy][x+2*dx] == 'Z':
-                    end = (x, y)
+                # elif cave[y+dy][x+dx] == 'A' and cave[y+2*dy][x+2*dx] == 'A':
+                #     start = (x, y)
+                # elif cave[y+dy][x+dx] == 'Z' and cave[y+2*dy][x+2*dx] == 'Z':
+                #     end = (x, y)
                 elif cave[y+dy][x+dx].isupper():
                     # This if/elif checks if the portal is on the left/top, or on the right/bottom. If it's on the left/top; the order of letters has to be reversed.
                     if dy+dx == -1:
-                        portal = (cave[y+2*dy][x+2*dx], cave[y+dy][x+dx])
+                        portalname = (cave[y+2*dy][x+2*dx], cave[y+dy][x+dx])
                     elif dy+dx == 1:
-                        portal = (cave[y+dy][x+dx], cave[y+2*dy][x+2*dx])
+                        portalname = (cave[y+dy][x+dx], cave[y+2*dy][x+2*dx])
                     
                     if x == 2 or x == 114 or y == 2 or y == 122:
-                        outerPortals[portal] = (x,y)
-                        outerPortalsLocations[(x,y)] = portal
+                        portals.append(Portal(portalname, (x,y), OUTER))
                     elif x == 32 or x == 84 or y == 32 or y == 92:
-                        innerPortals[portal] = (x,y)
-                        innerPortalsLocations[(x,y)] = portal
-                    else:
-                        print("Something went wrong 1")
+                        portals.append(Portal(portalname, (x,y), INNER))
+                    
+                    portalsLocations[(x,y)] = portals[-1]
+                    
+                    for p in portals[:-1]:
+                        if p.name == portalname:
+                            p.mirror = portals[-1]
+                            portals[-1].mirror = p
+                    
+                    if portalname == ('A', 'A'):
+                        start = portals[-1]
+                    elif portalname == ('Z', 'Z'):
+                        finish = portals[-1]
+                
             neighbours[(x,y)] = n
 
+# =============================================================================
+# Find distances between all portals in one donut
+# =============================================================================
 
-def distanceto2(point, distance = 0, depth = 0, alreadyfound = {}, foundPortals = []):
-    alreadyfound[(point, depth)] = distance
+def distanceto2(point, distance = 0, alreadyfound = {}, portalsFound = {}):
+    alreadyfound[point] = distance
     distance += 1
-    # print(distance)
+    
     for neighbour in neighbours[point]:
-        if neighbour in innerPortalsLocations.keys() and depth < 4:
-            n = outerPortals[innerPortalsLocations[neighbour]]
-            depth += 1
-            # alreadyfound, foundPortals = distanceto2(outerPortals[innerPortalsLocations[n]], distance, depth+1, alreadyfound, foundPortals)
-        elif neighbour in outerPortalsLocations.keys() and depth > 0:
-            n = innerPortals[outerPortalsLocations[neighbour]]
-            depth -= 1
-            # alreadyfound, foundPortals = distanceto2(innerPortals[outerPortalsLocations[n]], distance, depth-1, alreadyfound, foundPortals)
-        else:
-            n = neighbour
+        if neighbour not in alreadyfound.keys() or alreadyfound[neighbour] > distance:
+            if neighbour in portalsLocations.keys():
+                portalsFound[portalsLocations[neighbour]] = [distance, 0]     
+            alreadyfound, portalsFound = distanceto2(neighbour, distance, alreadyfound, portalsFound)
+    return alreadyfound, portalsFound
+
+
+portalsDistance = {}
+for p in portals:
+    _, portalsDistance[p] = distanceto2(p.location, 0, {}, {}) 
+
+# =============================================================================
+# Combine single-length paths:
+# =============================================================================
+
+for portal in portals:
+    while(len(portalsDistance[portal]) == 1):
+        caveExit = list(portalsDistance[portal].keys())[0]
+        if caveExit == start or caveExit == finish:
+            break
+        caveEntrance = caveExit.mirror
+      
+        currentDistance = portalsDistance[portal][caveExit][0]
+        currentLevel = portalsDistance[portal][caveExit][1]
         
-        if (n, depth) in alreadyfound.keys():
-            if alreadyfound[(n, depth)] > distance:
-                alreadyfound, foundPortals = distanceto2(n, distance, depth, alreadyfound, foundPortals)
-        else:
-            alreadyfound, foundPortals = distanceto2(n, distance, depth, alreadyfound, foundPortals)
+        nextSteps = portalsDistance[caveEntrance]
+        for nextStep in nextSteps:
+            nextDistance = currentDistance + nextSteps[nextStep][0] + 1
+            nextLevel = currentLevel + nextSteps[nextStep][1] + nextStep.orientation
+            
+            portalsDistance[portal][nextStep] = [nextDistance, nextLevel]
+        
+        portalsDistance[portal].pop(caveExit)
 
-    return alreadyfound, foundPortals
+# =============================================================================
+# Check which portals are still valid, and remove the rest
+# =============================================================================
+exits = set([finish])
+entrances = set([start])
+for p in portals:
+    for key in portalsDistance[p]:
+        exits.add(key)
+        if key.mirror:
+            entrances.add(key.mirror)
 
-#TODO this doesn't work. A better path-finding algorith is needed; start with mapping distances between portals. Similar to day 18
+for p in portals:
+    if p not in entrances:
+        portalsDistance.pop(p)
 
-foundPortals = []
-distances, foundPortals = distanceto2(start)
+for p in entrances:
+    print(p, portalsDistance[p])
 
-print(distances[end])
+# =============================================================================
+# Find the shortest path from start to finish
+# =============================================================================
+
+#TODO Fix this for steps over multiple depths.
+# paths = {}
+# paths[(start,)] = [0, 0]
+# finished = False
+# for _ in range(10000):
+#     #Determine best path
+#     shortestPathLength = 2**16
+#     for p in paths:
+#         if paths[p][0] < shortestPathLength:
+#             bestPath = p
+#             shortestPathLength = paths[p][0]                #Is the shortest path really the best? Or the highest level?
+#     if shortestPathLength == 2**16:
+#         raise Exception("No best path found") 
+    
+#     #The next entrance is the mirror of the last step 
+#     caveexit = bestPath[-1]
+#     if caveexit.mirror:
+#         entrance = caveexit.mirror
+#     else:
+#         print("No mirror found")
+#         entrance = caveexit
+
+    
+#     nextSteps = portalsDistance[entrance]
+#     currentLevel = paths[bestPath][1]
+    
+#     for nextStep in nextSteps:                                                  #Add all possible next paths
+#         # if nextStep not in bestPath:                                            #If the next path is not already in the path (visiting a portal twice does not make sense)
+#         if not (nextStep.orientation == OUTER and currentLevel == 0):       #Don't go up from the highest level
+#             if nextStep == finish and currentLevel == 0:
+#                 newLength = paths[bestPath][0] + portalsDistance[entrance][nextStep][0]
+#                 print("Total length : ", newLength)
+#                 finished = True
+#             elif nextStep != finish and nextStep != start :                                      #Ignore the finish if not at the top level
+#                 newPath = bestPath + (nextStep,)
+#                 newLength = paths[bestPath][0] + portalsDistance[entrance][nextStep][0] + 1
+#                 newLevel = currentLevel + nextStep.orientation
+#                 paths[newPath] = [newLength, newLevel]
+                 
+#     if finished:
+#         break        
+    
+#     paths.pop(bestPath)
+    
+    
+# print("All paths")
+# for q in paths:
+#     print(q, paths[q])
+# print("Next steps:")
+# print(nextSteps)
+# print()
+        
+           
+
+
+
+    #544 is too low
+    #554 is too low

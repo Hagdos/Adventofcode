@@ -23,9 +23,7 @@ def findshortestpath(paths, relevantkeys, distancetostart):
     maxpathlength = len(relevantkeys)+1
     stop = False
     for i in range(40000):
-        # print(paths)
-        # if not i%100:
-        #     print(i)
+        # Find the best path to continue on
         bestpath = 10**20    #Random "big" number
         for p in paths:
             #Best path is shortest path per key
@@ -36,7 +34,6 @@ def findshortestpath(paths, relevantkeys, distancetostart):
                 ps = p
         if bestpath == 2**16:
             print("No best path found")
-            #Return error
             return paths
         
         #Add new paths
