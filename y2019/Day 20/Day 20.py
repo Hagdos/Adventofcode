@@ -74,7 +74,10 @@ class Portal:
         self.mirror = None
         
     def __repr__(self):
-        return str(self.name) + ' ' + str(self.orientation)
+        if self.orientation == INNER:
+            return str(self.name) + ' INNER'
+        else:
+            return str(self.name) + ' OUTER'
 
 
 # =============================================================================
@@ -97,10 +100,14 @@ for y,line in enumerate(cave):
                 #     end = (x, y)
                 elif cave[y+dy][x+dx].isupper():
                     # This if/elif checks if the portal is on the left/top, or on the right/bottom. If it's on the left/top; the order of letters has to be reversed.
+                    # if dy+dx == -1:
+                    #     portalname = (cave[y+2*dy][x+2*dx], cave[y+dy][x+dx])
+                    # elif dy+dx == 1:
+                    #     portalname = (cave[y+dy][x+dx], cave[y+2*dy][x+2*dx])
                     if dy+dx == -1:
-                        portalname = (cave[y+2*dy][x+2*dx], cave[y+dy][x+dx])
+                        portalname = cave[y+2*dy][x+2*dx] + cave[y+dy][x+dx]
                     elif dy+dx == 1:
-                        portalname = (cave[y+dy][x+dx], cave[y+2*dy][x+2*dx])
+                        portalname = cave[y+dy][x+dx] + cave[y+2*dy][x+2*dx]
                     
                     if x == 2 or x == 114 or y == 2 or y == 122:
                         portals.append(Portal(portalname, (x,y), OUTER))
@@ -114,9 +121,9 @@ for y,line in enumerate(cave):
                             p.mirror = portals[-1]
                             portals[-1].mirror = p
                     
-                    if portalname == ('A', 'A'):
+                    if portalname == 'AA':
                         start = portals[-1]
-                    elif portalname == ('Z', 'Z'):
+                    elif portalname == 'ZZ':
                         finish = portals[-1]
                 
             neighbours[(x,y)] = n
@@ -157,10 +164,12 @@ for portal in portals:
         
         nextSteps = portalsDistance[caveEntrance]
         for nextStep in nextSteps:
-            nextDistance = currentDistance + nextSteps[nextStep][0] + 1
-            nextLevel = currentLevel + nextSteps[nextStep][1] + nextStep.orientation
-            
-            portalsDistance[portal][nextStep] = [nextDistance, nextLevel]
+            if nextStep != start:
+                if not (nextStep == finish and caveEntrance.orientation == INNER):   #TODO: Check if this is correct...
+                    nextDistance = currentDistance + nextSteps[nextStep][0] + 1
+                    nextLevel = currentLevel + nextSteps[nextStep][1] + nextStep.orientation
+                    
+                    portalsDistance[portal][nextStep] = [nextDistance, nextLevel]
         
         portalsDistance[portal].pop(caveExit)
 
