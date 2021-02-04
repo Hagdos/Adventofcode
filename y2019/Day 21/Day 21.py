@@ -21,14 +21,45 @@ def printdisplay(outputs):
     print(''.join(disp[n][line]))
     return disp
 
+inputs = []
+springcode = open('springscript.txt')
+springcode = open('springscript2.txt')
+
+for line in springcode:
+    for c in line:
+        inputs.append(ord(c))
+        
+
 #Open and run code
 f = open('code.txt')
 code = f.readline().strip().split(',')
 mem = ic.codetomem(code)
-mem, outputs, counters, finished = ic.runintcode(mem)
+mem, outputs, counters, finished = ic.runintcode(mem, inputs)
 
 disp = printdisplay(outputs)
+print(outputs)
 
 
-# C:\Users\Tom Kooyman\Documents\AoC\y2019
-# D:\Mijn Documenten\AdventofCode\y2019
+
+# =============================================================================
+# Reasoning for springscript
+# =============================================================================
+
+# Jump if there's a hole at A, B or C, but not D'
+
+# Available: AND, OR and NOT; one temp register and the Jump register.
+# Jumps if J is true
+# ABCD is true if there's ground'
+# T and J start as false
+
+# if D and (not A or not B or not C)
+# if D and not (A and B and C)
+
+#not (A and B and C)
+# NOT T T
+# AND A T
+# AND B T
+# AND C T
+# NOT T J
+
+# AND D J
