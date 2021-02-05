@@ -1,7 +1,16 @@
-NOT T T
-AND A T
-AND B T
-AND C T
-NOT T J
-AND D J
+# not (A and B and C)
+NOT J J   #T True
+AND A J   #if A
+AND B J   #if A AND B
+AND C J   #if A AND B AND C
+NOT J J   #if not (A & B & C)
+
+# E or H
+OR E T
+OR H T
+
+# AND D and E|H (T) and !(A&B&C) (J)
+AND D J   #if D & not (A&B&C)
+AND T J
+
 RUN
