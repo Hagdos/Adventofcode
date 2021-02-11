@@ -5,7 +5,7 @@ code = f.readline().strip().split(',')
 
 mem = ic.codetomem(code)
 inputs = [1]
-mem, output = ic.runintcode(mem, inputs)
+mem, output, counters, finished = ic.runintcode(mem, inputs)
         
 print(output)
 
@@ -15,6 +15,6 @@ print(output)
 
 mem = ic.codetomem(code)
 inputs = [2]
-mem, output = ic.runintcode(mem, inputs)
+mem, output, counters, finished = ic.runintcode(mem, inputs)
 
 print(output)
