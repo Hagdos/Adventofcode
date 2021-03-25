@@ -76,7 +76,7 @@ class GUI(QWidget):
             for series in range(minseries, maxseries+1):
                 if n%series == 0:
                     parallel = n//series
-                    divisors = [d for d in range(2, series) if series%d == 0]
+                    divisors = ', '.join([str(d) for d in range(2, series) if series%d == 0])
                     Vmin = int(series * float(self.minCellVolt.text()))
                     Vmax = int(series * float(self.maxCellVolt.text()))
                     Vtyp = int(series * 3.6)
@@ -100,14 +100,13 @@ class GUI(QWidget):
             for options in data[ncells]:
                 self.table.setItem(line ,0, QTableWidgetItem(str(ncells)))
                 for c, d in enumerate(options):
-                    self.table.setItem(line ,c+1, QTableWidgetItem(str(d)))
+                    self.table.setItem(line, c+1, QTableWidgetItem(str(d)))
                 line+=1
             
         self.table.resizeRowsToContents()
 
     def inputchanged(self):
         self.fillTable()
-        
         
     def keyPressEvent(self, keyEvent):
         super(GUI, self).keyPressEvent(keyEvent)
