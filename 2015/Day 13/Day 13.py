@@ -1,4 +1,8 @@
 import itertools
+import time
+
+now = time.time()
+
 part2 = False
 
 inputs = open('input.txt')
@@ -23,10 +27,15 @@ if part2 == True:
         connections[person]['Me'] = 0
     
     
-groupsize = len(connections)
-    
+groupsize = len(connections)-1
+group = list(connections.keys())
 maxpoints = 0
-for ordering in itertools.permutations(connections.keys(), groupsize):
+
+p0 = group.pop()
+
+for ordering in itertools.permutations(group, groupsize):
+    ordering = list(ordering)
+    ordering.append(p0)
     points = 0
     for i, person in enumerate(ordering):
         
@@ -36,5 +45,6 @@ for ordering in itertools.permutations(connections.keys(), groupsize):
     if points > maxpoints:
         maxpoints = points
         bestorder = ordering
-        
+ 
+print('solved in ', time.time()-now, 'seconds')
 print('The answer is:', maxpoints, bestorder)
