@@ -1,5 +1,4 @@
 import re
-import itertools
 
 class Player:
     def __init__(self, name, damage, armour, hp, outfit = None):
