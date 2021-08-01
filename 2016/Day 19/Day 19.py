@@ -2,9 +2,9 @@ noElves = 3004953
 
 Elves = range(1,noElves+1)
 
-odd = 1     # To make sure the script starts with elf 1.
+odd = 0     # To make sure the script starts with elf 1.
 
-#On every loop; take out half of the elves.
+#On every loop; take out half of the elves, starting at either 0 or 1 depending on where the last loop ended
 while len(Elves)>1:
     old_odd = odd
     odd = (len(Elves)+old_odd)%2
