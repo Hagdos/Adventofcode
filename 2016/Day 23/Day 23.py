@@ -1,5 +1,3 @@
-
-
 # Check if the argument given with an instruction is a registar value or an
 # integer, and return the correct value
 def readArgument(value):
