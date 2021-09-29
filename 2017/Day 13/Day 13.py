@@ -1,22 +1,16 @@
-def calcScannerLocation(depth, time):
-    location = time % (depth * 2 - 2)
-    if location // depth:
-        return 2 * depth - location - 2
-    else:
-        return location
-
+import time
 
 def calcPrice(firewalls, starttime):
     ans = 0
     for firewall in firewalls.keys():
-        if calcScannerLocation(firewalls[firewall], firewall+starttime) == 0:
+        if (firewall+starttime) % (firewalls[firewall] * 2 - 2) == 0:
             ans += firewalls[firewall] * firewall
     return ans
 
 
 def checkPass(firewalls, starttime):
     for firewall in firewalls.keys():
-        if calcScannerLocation(firewalls[firewall], firewall+starttime) == 0:
+        if (firewall+starttime) % (firewalls[firewall] * 2 - 2) == 0:
             return False
     return True
 
@@ -32,6 +26,8 @@ for line in file:
 
 ans1 = calcPrice(firewalls, 0)
 
+start = time.time()
+
 Passed = False
 starttime = 0
 while not Passed:
@@ -39,6 +35,8 @@ while not Passed:
     Passed = checkPass(firewalls, starttime)
 
 ans2 = starttime
+
+print(time.time()-start)
 
 print('The answer to part 1: ', ans1)
 print('The answer to part 2: ', ans2)
