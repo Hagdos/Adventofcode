@@ -2,18 +2,20 @@
 
 from urllib.request import Request, urlopen
 import os
+import webbrowser
 
 year = input('Year: ')
 day = input('Day: ')
 
 path = str(year) + '/Day ' + str(day)
-url = 'https://adventofcode.com/' + str(year) + '/day/' + str(day) + '/input'
+url = 'https://adventofcode.com/' + str(year) + '/day/' + str(day)
+inputurl = url + '/input'
 
 if os.path.isdir(path):
     print('Folder already exists')
 else:
     # Read input data from HTTP
-    inputrequest = Request(url)
+    inputrequest = Request(inputurl)
     inputrequest.add_header('Cookie', 'session=53616c7465645f5f88f0086678489a3b1cc3eb6b191b9140bc4956a0bbb5a8181524dcff350e62f74979bfa8f0a145f9')
     puzzleInput = urlopen(inputrequest).read()
     
@@ -32,5 +34,7 @@ else:
     pythonFile.write('print(\'The answer to part 1: \', ans1)\n')
     pythonFile.write('print(\'The answer to part 2: \', ans2)\n')
     pythonFile.close()
+    
+    webbrowser.open(url)
         
 # input('Done')
