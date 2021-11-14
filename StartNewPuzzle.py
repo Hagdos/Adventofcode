@@ -16,7 +16,7 @@ if os.path.isdir(path):
 else:
     # Read input data from HTTP
     inputrequest = Request(inputurl)
-    inputrequest.add_header('Cookie', 'session=53616c7465645f5f88f0086678489a3b1cc3eb6b191b9140bc4956a0bbb5a8181524dcff350e62f74979bfa8f0a145f9')
+    inputrequest.add_header('Cookie', 'session=53616c7465645f5f713fc7491ad2f15bd23ec8bc8bec78b5dc10c13afec0e9dd12e1bcee68342128c616e1e1670b76fb')
     puzzleInput = urlopen(inputrequest).read()
     
     # Write input data to input.txt
