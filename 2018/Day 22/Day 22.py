@@ -43,29 +43,25 @@ rtype[ty][tx] = 0
 # 7 minutes are added if the wrong equipment is equipped
 def calcScore(x, y, minutes, equip):
     score = abs(tx-x) + abs(ty-y) + minutes
-    # if equip != 1:
-    #     score += 7
+    if equip != 1:
+        score += 7
     return score
 
 
-def calcDistance(x, y):
-    return abs(tx-x) + abs(ty-y)
-
-
 def nextSteps(status):
-    _, _, x, y, minutes, equip = status
+    _, minutes, x, y, equip = status
     ns = []
     for dx in (-1, 1):
         if x+dx >= 0 and rtype[y][x+dx] != equip:
-            ns.append((calcScore(x+dx, y, minutes+1, equip), calcDistance(x+dx, y), x+dx, y, minutes+1, equip))
+            ns.append((calcScore(x+dx, y, minutes+1, equip), minutes + 1, x+dx, y, equip))
     for dy in (-1, 1):
         if y+dy >= 0 and rtype[y+dy][x] != equip:
-            ns.append((calcScore(x, y+dy, minutes+1, equip), calcDistance(x, y+dy), x, y+dy, minutes+1, equip))
+            ns.append((calcScore(x, y+dy, minutes+1, equip), minutes + 1, x, y+dy, equip))
 
     # Equipment change
     t = rtype[y][x]
-    newequip = [x for x in (0, 1, 2) if x != equip and x != t][0]
-    ns.append((calcScore(x, y, minutes+7, newequip), calcDistance(x, y), x, y, minutes+7, newequip))
+    newequip = [e for e in (0, 1, 2) if e != equip and e != t][0]
+    ns.append((calcScore(x, y, minutes+7, newequip), minutes+7, x, y, newequip))
 
     return ns
 
@@ -74,33 +70,36 @@ x, y = (0, 0)
 equip = 1
 minutes = 0
 
-status = (calcScore(x, y, minutes, equip), calcDistance(x, y), x, y, minutes, equip)
+status = (calcScore(x, y, minutes, equip), minutes, x, y, equip)
 
 seen = {(x, y, equip): 0}
 heads = [status]
 found = False
 
 start = time.time()
-for step in range(1000000):
+for step in range(294332):
     if step % 50000 == 0:
         print(step, ans2, time.time()-start)
 
     best = heads.pop(0)
     ns = nextSteps(best)
+
+    print(ns)
     for n in ns:
-        _, _, x, y, minutes, equip = n
+        _, minutes, x, y, equip = n
+
+        assert rtype[x][y] != n
 
         if x == tx and y == ty and equip == 1:
             print('Solution:', minutes, step)
             ans2 = min(ans2, minutes)
-            found = True
-            break
+            # found = True
+            # break
 
         # if this position has already been visited; with less minutes
         # dont use this direction
         elif (x, y, equip) not in seen or seen[(x, y, equip)] > minutes:
             seen[(x, y, equip)] = minutes
-            heads.append(n)
             bisect.insort(heads, n)
 
     if found:
@@ -109,12 +108,12 @@ for step in range(1000000):
 
 print("Step:", step)
 print(*heads[:20], sep='\n')
-print("(scr, dis, x, y, m, e)")
+print("(scr, m, x, y, e)")
 
 print('The answer to part 1: ', sum([sum(x[:tx+1]) for x in rtype[:ty+1]]))
-
 print('The answer to part 2: ', ans2)
 
+# print(*rtype[ty-2:ty+3], sep='\n')
 # 1122 is too high
 # 1095 is too high
 # 1056 is too high
@@ -122,9 +121,6 @@ print('The answer to part 2: ', ans2)
 # 1041 is wrong
 
 # Someone else's input says 1043..
-
-# dqueue?
-
 
 # Rocky = 0 : Allows gear and torch  (2, 1)
 # Wet   = 1 : Allows gear and none   (2, 0)
