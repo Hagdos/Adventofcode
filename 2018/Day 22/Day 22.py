@@ -1,38 +1,31 @@
 import time
 import bisect
 
-file = open('2018/Day 22/input.txt').readlines()
+file = open('input.txt').readlines()
 data = [x.strip().split() for x in file]
 ans2 = 100000
 
 depth = int(data[0][1])
 tx, ty = (int(i) for i in data[1][1].split(','))
 
-# # Testvalues
-# depth = 510
-# tx, ty = (10, 10)
+size = ty + 100
 
-size = ty + 1000
-
+# Create arrays for erosion and rocktype
 erosion = [[None]*(size) for _ in range(size)]
 rtype = [[None]*(size) for _ in range(size)]
 emod = 20183
 
-for x in range(size):
-    erosion[0][x] = (x*16807 + depth) % emod
-    rtype[0][x] = erosion[0][x] % 3
-
-
-for y in range(1, size):
+for y in range(size):
     for x in range(size):
-        if x == 0:
+        if y == 0:
+            erosion[y][x] = (x*16807 + depth) % emod
+        elif x == 0:
             erosion[y][x] = (y*48271 + depth) % emod
+        elif x == tx and y == ty:
+            erosion[y][x] = depth
         else:
             erosion[y][x] = (erosion[y-1][x] * erosion[y][x-1] + depth) % emod
         rtype[y][x] = erosion[y][x] % 3
-
-erosion[ty][tx] = 0
-rtype[ty][tx] = 0
 
 
 # Ideal score is distance to go + minutes; because that guarantees that
@@ -47,7 +40,9 @@ def calcScore(x, y, minutes, equip):
         score += 7
     return score
 
-
+# Return a list of all possible next steps (4 directions + equipment change)
+# Will only return the steps that are possible with the current equipment
+# Does not check if the next step is already known
 def nextSteps(status):
     _, minutes, x, y, equip = status
     ns = []
@@ -58,69 +53,62 @@ def nextSteps(status):
         if y+dy >= 0 and rtype[y+dy][x] != equip:
             ns.append((calcScore(x, y+dy, minutes+1, equip), minutes + 1, x, y+dy, equip))
 
-    # Equipment change
+    # Equipment change -> Change to the equipment that's not the current
+    # and not the same as the current tile's type.
     t = rtype[y][x]
     newequip = [e for e in (0, 1, 2) if e != equip and e != t][0]
     ns.append((calcScore(x, y, minutes+7, newequip), minutes+7, x, y, newequip))
 
     return ns
 
-
+# Starting position: location 0,0; equipped with torch.
 x, y = (0, 0)
 equip = 1
 minutes = 0
 
+# A status contains a score for sorting the most promising head, the minutes
+# taken so far, x/y-location and the equipped tool
 status = (calcScore(x, y, minutes, equip), minutes, x, y, equip)
 
+# seen is a list of already visited locations + equipment; with the lowest
+# possible minutes to get there
 seen = {(x, y, equip): 0}
+
+# heads is the list of all trailheads. Every step the most promising head
+# is taken off the list; and the next steps for that head are added to the list
 heads = [status]
 found = False
 
 start = time.time()
-for step in range(294332):
+for step in range(250000):
     if step % 50000 == 0:
         print(step, ans2, time.time()-start)
 
     best = heads.pop(0)
     ns = nextSteps(best)
-
-    print(ns)
     for n in ns:
         _, minutes, x, y, equip = n
 
-        assert rtype[x][y] != n
-
+        # For every nextstep; check if it's the destination
         if x == tx and y == ty and equip == 1:
             print('Solution:', minutes, step)
-            ans2 = min(ans2, minutes)
-            # found = True
-            # break
+            ans2 = minutes
+            found = True
+            break
 
-        # if this position has already been visited; with less minutes
-        # dont use this direction
+        # And check if we've been here before. If we've already found 
+        # a path to (x,y) that's better or as good as; skip this nextstep.
         elif (x, y, equip) not in seen or seen[(x, y, equip)] > minutes:
+            # Otherwise; add/update the seen
             seen[(x, y, equip)] = minutes
+            # And add to the sorted list; in the right location
             bisect.insort(heads, n)
 
     if found:
         break
 
-
-print("Step:", step)
-print(*heads[:20], sep='\n')
-print("(scr, m, x, y, e)")
-
 print('The answer to part 1: ', sum([sum(x[:tx+1]) for x in rtype[:ty+1]]))
 print('The answer to part 2: ', ans2)
-
-# print(*rtype[ty-2:ty+3], sep='\n')
-# 1122 is too high
-# 1095 is too high
-# 1056 is too high
-# 1048 is wrong
-# 1041 is wrong
-
-# Someone else's input says 1043..
 
 # Rocky = 0 : Allows gear and torch  (2, 1)
 # Wet   = 1 : Allows gear and none   (2, 0)
