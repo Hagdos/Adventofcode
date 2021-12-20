@@ -12,7 +12,7 @@ for i, line in enumerate(data):
 for j, line in enumerate(data[i+1:]):
     a = line[2].split('=')
     fold = int(a[1])
-    
+    print(a)
     # Check dimension
     if a[0] == 'x':
         dim = 0

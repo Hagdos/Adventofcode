@@ -43,7 +43,9 @@ for step in range(10000000):
         ans2 = r
         break
     
-    for dx, dy in ((0, 1), (1, 0), (0, -1), (-1, 0)):
+    # for dx, dy in ((0, 1), (1, 0), (0, -1), (-1, 0)):
+        
+    for dx, dy in ((0, 1), (1, 0)):
         nx = x+dx
         ny = y+dy
         if  tx2 >= nx >= 0 and ty2 >= ny >= 0:

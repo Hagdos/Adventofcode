@@ -27,7 +27,7 @@ def readPacket(b):
         return value
     
     else:
-        # First grap the subpackets
+        # First grab the subpackets
         values = []
         ltype = int(readBits(b, 1))
         # Lengthtype = length of bits
