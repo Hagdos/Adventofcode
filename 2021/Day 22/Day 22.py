@@ -1,71 +1,68 @@
-def calcOverlap(r1, r2):
+import copy
+
+def checkOverlap(r1, r2):
     if any(r2[d][1] < r1[d][0] or r2[d][0] > r1[d][1] for d in range(3)):
-        return 0
+        return False
     else:
-        overlap = 1
-        for dim in range(3): # Calculate the overlap for each dimension. Total overlap is the 3 dimensions multiplied
-            if r2[dim][0] in range(r1[dim][0], r1[dim][1]+1):
-                pass
-    # This won' 
+        return True
+
+def returnRemaining(ra, r2):
+    r1 = copy.deepcopy(ra)
+    remaining = []
+    for dim in range(len(r1)):
+        if r1[dim][0] < r2[dim][0] <= r1[dim][1] :
+            new = [d.copy() for d in r1]
+            new[dim][1] = r2[dim][0]-1
+            r1[dim][0] = r2[dim][0]
+            remaining.append(new)
+        if r1[dim][0] <= r2[dim][1] < r1[dim][1]:
+            new = [d.copy() for d in r1]
+            new[dim][0] = r2[dim][1]+1
+            r1[dim][1] = r2[dim][1]
+            remaining.append(new)
+  
+    return remaining
+
+def size(r):
+    s = 1
+    for dim in range(len(r)):
+        d = r[dim][1] - r[dim][0] + 1
+        s *= d        
+    return s
 
 file = open('input.txt').readlines()
 data = [x.strip() for x in file]
-ans1 = ans2 = 0
+ans = 0
 
-on = set()
 boxes = []
 
 for line in data:
     cmd, coords = line.split(' ')
     ranges = coords.split(',')
-    ranges = [tuple(int(i) for i in x[2:].split('..')) for x in ranges]
+    ranges = [[int(i) for i in x[2:].split('..')] for x in ranges]
     boxes.append((cmd, ranges))
     
-sboxes = boxes[:20]
-    
-i = 0
+sboxes = boxes[:]
+
+
+overlaps = []
 for i, (cmd, ranges) in enumerate(sboxes):
     if cmd == 'on':
-        size = [r[1] - r[0] for r in ranges]
-        size = size[0]*size[1]*size[2]
+        onboxes = [ranges]
         for _, r2 in sboxes[i+1:]:
-            size -= calcOverlap(ranges, r2)
-        
-        ans2 += size
-        
-        
-        
-        
-        
-        
-    # else:
-    #     i = 0
-    #     for cmd2, ranges2 in boxes:
-    #         if ranges != ranges2:
-    #             if all((ranges2[r][0] < ranges[r][0] < ranges2[r][1] or ranges2[r][0] < ranges[r][1] < ranges2[r][1]) for r in range(3)):
-    #                 i+= 1
-    #                 if any((ranges2[r][0] < ranges[r][0] < ranges2[r][1] and ranges2[r][0] < ranges[r][1] < ranges2[r][1]) for r in range(3)):
-    #                     print(cmd, ranges)
-    #                     print(cmd2, ranges2)
-    #                     print()
-                    
-                    
-                    
-                    
-        print(i)
+            new_onboxes = []
+            for r1 in onboxes:
+                if checkOverlap(r1, r2):
+                    new_onboxes += returnRemaining(r1, r2)
+                else:
+                    new_onboxes.append(r1)
+            onboxes = new_onboxes
 
-
-
-
-    #     print(cmd, ranges)
-    #     for x in range(ranges[0][0], ranges[0][1]+1):
-    #         for y in range(ranges[1][0], ranges[1][1]+1):
-    #             for z in range(ranges[2][0], ranges[2][1]+1):
-    #                 if cmd == 'on':
-    #                     on.add((x, y, z))
-    #                 else:
-    #                     on.discard((x, y, z))
-    
-
-print('The answer to part 1: ', len(on))
-print('The answer to part 2: ', ans2)
+                
+        for r1 in onboxes:
+            ans += size(r1)
+    if i == 19:
+        print('The answer to part 1: ', ans)
+            
+            
+print('The answer to part 2: ', ans)
