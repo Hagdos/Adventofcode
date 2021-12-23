@@ -86,10 +86,16 @@ def enterRoom(energy, rooms, hall):
     for i, pod in enumerate(pods):
         maxright = locs[i+1] if i+1 < len(pods) else len(hall)-1
         if roomAvailable(rooms, pod, maxleft, maxright):
-            pass  # TODO: Move to the room; return state
+            newhall = hall.copy()
+            newhall[locs[i]] = '.'
+            newrooms = rooms.copy()
+            newrooms[rightroom[pod]].append(pod)
+            newenergy = energy + abs((rightroom[pod]*2 + 1) - locs[i]) * cost[pod]
+            return [(newenergy, newrooms, newhall)]
         maxleft = locs[i]
 
-    return energy, rooms, hall
+    return [(energy, rooms, hall)]
+
 
 cost = {'A': 1,
         'B': 10,
@@ -101,19 +107,34 @@ rightroom = {'A': 0,
              'C': 2,
              'D': 3}
 
-hall = list('...........')
-rooms = [['D', 'B'], ['C', 'C'], ['A', 'D'], ['B', 'A']]
+# hall = list('...........')
+# rooms = [['D', 'B'], ['C', 'C'], ['A', 'D'], ['B', 'A']]
+
+hall = list('D.........A')
+rooms = [['B'], ['C', 'C'], ['A', 'D'], ['B']]
+
 energy = 0
 heads = [(energy, rooms, hall)]
+
+seen = dict()
+
 
 for _ in range(2):
     state = heads.pop()
     newheads = enterRoom(*state)
-    if newheads == state:
+
+    if newheads[0] == state:
         newheads = exitRoom(*state)
+
+    for n in newheads:
+        energy, rooms, hall = n
+        key = (tuple(tuple(room) for room in rooms), tuple(hall))
+        if key not in seen or energy < seen[key]:
+            seen[key] = energy
+            heads.append(n)
     # Todo: Check roomAvailables before exitRoom. (make entryRoom?)
-for h in heads:
-    printRoom(*h)
+    for h in heads:
+        printRoom(*h)
 
 # Issues:
 # #############
