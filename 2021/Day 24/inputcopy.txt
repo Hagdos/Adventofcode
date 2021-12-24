@@ -1,0 +1,252 @@
+inp w        -w = a
+
+
+
+
+add x 10
+eql x w
+eql x 0     -> x = 1 # Check if this is always true? If not; something is wrong. All eql x w are false?
+
+add y 25
+mul y x
+add y 1     -> y = 26
+
+mul y 0     
+add y w     -> y = a
+add y 15
+mul y x
+add z y     -> z = y = a+15
+inp w       -> w = b
+mul x 0
+add x z     -> x = a+15
+
+
+add x 12    -> x = a+15+12
+eql x w     
+eql x 0     -> x = 1
+mul y 0
+add y 25
+mul y x
+add y 1     -> y = 26
+mul z y     -> z = (a+15)*26
+mul y 0
+add y w
+add y 8
+mul y x     -> y = b + 8
+add z y     -> z = (a+15)*26 + b
+inp w       -> w = c
+mul x 0
+add x z
+mod x 26
+
+add x 15    
+eql x w
+eql x 0     -> x = 1
+mul y 0     
+add y 25
+mul y x
+add y 1     -> y = 26
+mul z y     -> z = ((a+15)*26 + b)*26
+mul y 0
+add y w
+add y 2
+mul y x     -> y = c + 2
+add z y     -> z = ((a+15)*26 + b)*26 + c + 2
+inp w       -> w = d
+mul x 0
+add x z
+mod x 26    -> x = c + 2
+div z 26    -> z = ((a+15)*26 + b) 
+add x -9
+eql x w
+eql x 0     -> x = 1
+mul y 0     -> 
+add y 25
+mul y x
+add y 1     -> y = 26
+mul z y     -> z = ((a+15)*26 + b)*26
+mul y 0
+add y w
+add y 6
+mul y x     -> y = d+6
+add z y     -> z = ((a+15)*26 + b)*26 + d + 6
+inp w       -> w = e
+mul x 0     
+add x z
+mod x 26    
+
+add x 15
+eql x w
+eql x 0     -> x = 1
+mul y 0 
+add y 25
+mul y x
+add y 1     -> y = 26
+mul z y     -> z = (((a+15)*26 + b)*26 + d + 6)*26
+mul y 0
+add y w
+add y 13
+mul y x     -> y = e + 13
+add z y     -> z = (((a+15)*26 + b)*26 + d + 6)*26 + e + 13
+inp w       -> w = f
+mul x 0
+add x z
+mod x 26    
+
+add x 10
+eql x w
+eql x 0     -> x = 1
+mul y 0
+add y 25
+mul y x
+add y 1     -> y = 26
+mul z y     -> z = ((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26
+mul y 0
+add y w
+add y 4
+mul y x     -> y = f+4
+add z y     -> z = ((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4
+inp w       -> w = g
+mul x 0
+add x z
+mod x 26    
+
+add x 14    -> x = 4+14
+eql x w
+eql x 0     -> x = 1
+mul y 0
+add y 25
+mul y x
+add y 1     -> y = 26
+mul z y     -> z = (((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)*26
+mul y 0
+add y w
+add y 1
+mul y x     -> y = g+1
+add z y     -> z = (((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)*26 + g + 1
+inp w       -> w = h
+mul x 0
+add x z
+mod x 26    -> x = g+1
+div z 26    -> z = (((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)
+add x -5    -> x = g-4
+eql x w
+eql x 0     -> x = 1 if (g-4) != h else 0   -> Cond 1
+mul y 0
+add y 25
+mul y x
+add y 1     -> y = 26 if (g-4) != h else 1
+mul z y     -> z = (((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)* (26 or 1)
+mul y 0
+add y w
+add y 9
+mul y x     -> y = h + 9 if cond 1 else 0
+add z y     -> z = (((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)* (26 or 1) (+h+9 or +0)
+inp w       -> w = i
+mul x 0
+add x z
+mod x 26    -> x = h+9 or f+4
+
+add x 14 
+eql x w
+eql x 0     -> x = 1
+mul y 0
+add y 25
+mul y x
+add y 1     -> y = 26
+mul z y     -> z = ((((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)* (26 or 1) (+h+9 or +0))*26
+mul y 0
+add y w
+add y 5     
+mul y x     -> y = i+5
+add z y     -> z = ((((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)* (26 or 1) (+h+9 or +0))*26 + i + 5
+inp w       -> w = j
+mul x 0
+add x z
+mod x 26    -> x = i+5
+div z 26    -> z = ((((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4)* (26 or 1) (+h+9 or +0))
+add x -7    -> x = i-2
+eql x w
+eql x 0     -> x = 1 if i-2 != j else 0 (Cond 2)
+mul y 0
+add y 25
+mul y x
+add y 1     -> y = 26 or 1 (cond 2)
+mul z y     -> z = ((((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4) (*26+h+9) (*26)    
+mul y 0
+add y w
+add y 13
+mul y x     -> y = j + 13 or 0 (cond 2)
+add z y     -> z = ((((((a+15)*26 + b)*26 + d + 6)*26 + e + 13)*26 + f + 4) (*26+h+9) (*26+j+13)
+inp w       -> w = k
+mul x 0
+add x z
+mod x 26    -> x = f + 4 or h + 9 or j + 13
+div z 26    -> z = z minus the last part...
+add x -12
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 9
+mul y x
+add z y     # Same thing;  z (*26+k+9) if cond3
+inp w        -> w = l
+mul x 0
+add x z
+mod x 26
+div z 26    -> z = z minus the last part...
+add x -10
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x
+add z y     # z (*26+l+6)
+inp w        -> w = m
+mul x 0
+add x z
+mod x 26
+div z 26     -> z = z minus the last part...
+add x -1
+eql x w     # last part -1 equals m
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x
+add z y    * z (*26+m+2)
+inp w       -> w = n
+mul x 0
+add x z
+mod x 26    
+div z 26     -> z = z minus the last part...
+add x -11
+eql x w     # last part -11 != n
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x
+add z y

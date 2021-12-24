@@ -1,0 +1,252 @@
+inp w
+mul x 0
+add x z
+mod x 26    
+div z 1
+add x 10   if last+10 == input   (impossible; last = 0)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 15
+mul y x   add input + 15
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 12
+eql x w
+eql x 0   if last + 12 == input  (impossible; last = x+15)
+mul y 0   
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 8
+mul y x  add input + 8
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 15
+eql x w
+eql x 0  if last + 15 == input (impossible; last = x+8)
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x  add input + 2 (removed)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26   Remove last
+add x -9
+eql x w   if last - 9 == input   (possible; previnput + 2 - 9 == input)
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x  add input + 6  (preventable)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 15
+eql x w  if last + 15 == input (impossible )
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 13
+mul y x    add input + 13 (removed)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 10   if last + 10 == input (impossible)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 4
+mul y x   add input + 4 (removed)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 14   if last + 14 == input (impossible)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 1
+mul y x  add input + 1 (removed)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26   Remove last (input + 1)
+add x -5  if last - 5 equals input (possible; last is input + 1)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 9
+mul y x  add input + 9  (preventable)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 1
+add x 14 if last + 14 == input (impossible)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 5
+mul y x add input + 5  (removed)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26   Remove last (x + 5)
+add x -7  if last - 7 == input (possible; last = x + 5)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 13
+mul y x   add input + 13 (preventable)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26   Remove last  (x + 1)
+add x -12
+eql x w
+eql x 0  if last - 12 == input (impossible?  last = x + 1) -> this one may be possible if we don't prevent a preventable one. E.g. input + 13
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 9
+mul y x   add input + 9 (removed)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26   Remove last  (x + 9)
+add x -10   if last - 10 == input (possible; last = x + 9)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 6
+mul y x   add  input + 6 (preventable)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26
+div z 26   Remove last (x+4)
+add x -1  if last - 1 == input (possible; last = x+4)
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x  add input + 2 (preventable)
+add z y ---
+inp w
+mul x 0
+add x z
+mod x 26  
+div z 26   Remove last (x+13)
+add x -11  if last - 11 == input (possible, last = x+13) 
+eql x w
+eql x 0
+mul y 0
+add y 25
+mul y x
+add y 1
+mul z y
+mul y 0
+add y w
+add y 2
+mul y x  add input + 2 (preventable)
+add z y ---

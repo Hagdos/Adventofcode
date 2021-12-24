@@ -1,0 +1,76 @@
+1
+if last+10 == input   (impossible; last = 0)
+add input + 15 (removed 14)
+
+2
+if last + 12 == input  (impossible; last = x+15)
+add input + 8 (removed 13)
+
+3
+if last + 15 == input (impossible; last = x+8)
+add input + 2 (removed 4)
+
+4
+Remove last (3)
+if last - 9 == input   (possible; previnput + 2 - 9 == input)
+add input + 6  (preventable)
+
+rule: in4 = in3 - 7
+
+5
+if last + 15 == input (impossible )
+add input + 13 (removed 12)
+
+6
+if last + 10 == input (impossible)
+add input + 4 (removed 11)
+
+7
+if last + 14 == input (impossible)
+add input + 1 (removed 8)
+
+8
+Remove last (input + 1, 7)
+if last - 5 equals input (possible; last is input + 1)
+add input + 9  (preventable)
+
+rule: in8 = in7 - 4
+
+9
+if last + 14 == input (impossible)
+add input + 5 (removed 10)
+
+10
+Remove last (x + 5, 9)
+if last - 7 == input (possible; last = x + 5)
+add input + 13 (preventable)
+
+rule: in10 = in9 - 2
+
+11
+Remove last  (x + 4, 6)
+if last - 12 == input (possible, last = x + 4)
+add input + 9  (preventable)
+
+rule: in11 = in6 - 8
+
+12
+Remove last  (x + 13, 5)
+if last - 10 == input (possible; last = x + 13)
+add  input + 6 (preventable)
+
+rule: in12 = in5 + 3
+
+13
+Remove last (x+8, 2)
+if last - 1 == input (possible; last = x+8)
+add input + 2 (preventable)
+
+rule: in13 = in2 + 7
+
+14
+Remove last (x+15, 1)
+if last - 11 == input (possible, last = x+15) 
+add input + 2 (preventable)
+
+rule: in14 = in1 + 4
