@@ -3,10 +3,10 @@ import itertools
 class Creature:
     id_iter = itertools.count()
     
-    def __init__(self):
+    def __init__(self, ap):
         self.id = next(self.id_iter)
         self.hp = 200
-        self.ap = 3
+        self.ap = ap
 
 
     def __repr__(self):
@@ -14,38 +14,57 @@ class Creature:
     
     
     def turn(self, allies, enemies, cavern):
-        # If the unit is already in range of a target, it does not move, 
-        # but continues its turn with an attack. 
+        # Check if unit is still alive (could have been killed this turn)
+        if self.hp <= 0:
+            return False
         
+        # Check if there are enemies at all
+        if not enemies:
+            return True
+            
+        # If the unit is already in range of a target, it does not move, 
+        # but immediately attacks. 
         target = self.enemyInRange(allies, enemies)
         if target:
-            self.attack(target)
-            return
+            self.attack(target, enemies)
+            return False
         
         # Otherwise, since it is not in range of a target, it moves.
+        reached = self.move(allies, enemies, cavern)
         
-        self.move(allies, enemies, cavern)
-        self.attack(self.enemyInRange(allies, enemies))
-        
-        return
+        # If a target is reached; attack
+        if reached: 
+            target = self.enemyInRange(allies, enemies)
+            if target:
+                self.attack(target, enemies)
+        return False
     
     def enemyInRange(self, allies, enemies):
-        # Return the first enemy in range. If no enemies in range; return None
+        # Return the enemy with the lowest hp in range. 
+        # At equal hp the first is selected
+        # If no enemies in range; return None
         x, y = allies[self]
+        target = None
         for position in ((x, y-1), (x-1, y), (x+1, y), (x, y+1)):
             if position in enemies.values():
-                return findCreature(enemies, position)
-        
-        return None
+                possibleTarget = findCreature(enemies, position)
+                if not target or possibleTarget.hp < target.hp:
+                    target = possibleTarget
+        return target
 
 
-    def attack(self, enemy):
-        # TODO Attack the given enemy 
+    def attack(self, enemy, enemies):
+        # Attack the given enemy 
+        enemy.hp -= self.ap
+        # If enemy is dead; remove from list
+        if enemy.hp <= 0:
+            enemies.pop(enemy)
         return None
 
     def move(self, allies, enemies, cavern):
         nextStep, destination = self.findNearestEnemy(allies, enemies, cavern)
         allies[self] = nextStep
+        return nextStep == destination
             
     def findNearestEnemy(self, allies, enemies, cavern):
         # Finds nearest reachable enemy
@@ -56,7 +75,6 @@ class Creature:
         
         while Q:
             pos, firstStep = Q.pop(0)
-            print(pos)
             x, y = pos
             for position in ((x, y-1), (x-1, y), (x+1, y), (x, y+1)):
                 if position in enemies.values():
@@ -64,16 +82,16 @@ class Creature:
                 elif (position in cavern and position not in allies.values() 
                       and position not in visited):
                     if not firstStep:
-                        firstStep = position
+                        Q.append((position, position))
                     visited.add(position)
                     Q.append((position, firstStep))
-        return None
+                    
+        return allies[self], None
 
-def readInput(filename):
+def readInput(filename, ap):
     file = open(filename).readlines()
     data = [x.strip() for x in file]
     
-    # TODO Change for bidict? Check if these can be ordered.
     goblins = dict()
     elves = dict()
     cavern = set()
@@ -84,10 +102,12 @@ def readInput(filename):
                 cavern.add((x,y))
             elif char == 'G':
                 cavern.add((x,y))
-                goblins[Creature()] = (x, y)
+                goblins[Creature(3)] = (x, y)
             elif char == 'E':
                 cavern.add((x,y))
-                elves[Creature()] = (x, y)
+                elves[Creature(ap)] = (x, y)
+            elif char == ' ':
+                break
     
     xrange = range(x+1)
     yrange = range(y+1)
