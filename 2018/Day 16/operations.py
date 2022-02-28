@@ -45,6 +45,7 @@ def gtir(registers, A, B, C):
         registers[C] = 1
     else:
         registers[C] = 0
+
 # gtri (greater-than register/immediate) sets register C to 1 if register A is greater than value B. Otherwise, register C is set to 0.
 def gtri(registers, A, B, C):
     if registers[A] > B:
@@ -77,3 +78,6 @@ def eqrr(registers, A, B, C):
         registers[C] = 1
     else:
         registers[C] = 0
+
+
+opcodes = [bori, borr, addi, muli, addr, bani, gtri, setr, gtrr, seti, eqir, eqrr, mulr, eqri, gtir, banr]
