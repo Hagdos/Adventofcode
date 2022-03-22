@@ -1,0 +1,41 @@
+seti 123 0 4  # Set reg 4 to 123
+bani 4 456 4  # reg4 is bitwise reg4 and 456; is 72
+eqri 4 72 4   # Set reg4 to 1 if 72 (check bitwise AND)
+addr 4 1 1    # Skip next line if bitwise and passes
+seti 0 0 1    # Loop back if not  -> Main program starts here
+seti 0 0 4    # Set reg 4 back to 0
+
+6: # LOOP4
+bori 4 65536 5      # Set reg5 to bitwise OR with 65536 and reg4 (set reg5 to 2**16)
+seti 10704114 0 4   # Set reg4 to 10704114
+
+8: # LOOP2
+bani 5 255 2        # Set reg2 to bitwise AND of reg5 and 2**8-1 (coming from loop1; reg5 = 256, so reg2 = 0. Second time reg5 = 1, so reg2 =1)
+addr 4 2 4          # Add register 2 to register 4
+bani 4 16777215 4   # Bitwise AND register 4 with 2**24-1 (Basically reg4 % 2**24)
+muli 4 65899 4      # Multiply reg4 with 65899 (no logic)
+bani 4 16777215 4   # Bitwise and reg4 with 2**24-1 (again reg4 % 2**24)
+gtir 256 5 2        # Check if reg5 smaller than 256, set reg2 to 1 if True (initially not true; reg5 = 65536. Still not true after LOOP1, reg5 == 256)
+addr 2 1 1          # If true, skip next line
+addi 1 1 1          # If not true, skip next line
+seti 27 2 1         # If true, set IP to 27(+1), so instr 28 (LOOP3)
+seti 0 4 2          # Set reg2 to 0
+
+18: LOOP1  -> Each loop at the end, reg2 += 1. Reg3 = (reg2+1)*256. Break out of this loop when reg3 > 65536 -> reg2 > 65536/256-1 = 255. So after 256 loops, we go to inst 25.
+addi 2 1 3          # Reg3 = Reg2 + 1 ->
+muli 3 256 3        # Multiply reg3 by 256
+gtrr 3 5 3          # Reg3 = Reg3 > Reg5  (Initially not true; reg5 = 65536)
+addr 3 1 1          # If true, skip next line
+addi 1 1 1          # If not true, skip next line
+seti 25 5 1         # If true, GOTO 26 (Skip next two lines)
+addi 2 1 2          # If not true, reg2 += 1
+seti 17 5 1         # GOTO LOOP1 (18)
+
+26:
+setr 2 6 5          # Set reg 5 to reg2 (256, then 1)
+seti 7 8 1          # GOTO LOOP2
+
+28: LOOP3?
+eqrr 4 0 2          # REG2 = 1 if reg4 == reg0 -> First time input comes into play! Reg4 is 12420065 first time it loops around here
+addr 2 1 1          # If True (reg4 == input) > skip next line (end program)
+seti 5 3 1          # Go back to 6
