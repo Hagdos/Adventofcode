@@ -22,18 +22,14 @@ def runInstructions(instructions):
 def drawScreen(sprite):
     screen = []
     for v in range(1, 240, 40):
-        row = []
         for h in range(0, 40):
             if sprite[v+h] in [h-1, h, h+1]:
-                row.append('█')
+                screen.append('█')
             else:
-                row.append(' ')
-        screen.append(''.join(row))
+                screen.append(' ')
+        screen.append('\n')
 
-    for row in screen:
-        print(row)
-
-    return screen
+    return ''.join(screen)
 
 
 file = open('input.txt').readlines()
@@ -44,8 +40,9 @@ regx = runInstructions(instructions)
 signalstrength = calcSignalStrength(regx)
 ans1 = sum([signalstrength[i] for i in range(20, 221, 40)])
 
-drawScreen(regx)
+
 
 print('The answer to part 1: ', ans1)
 # print(len(regx), len(signalstrength))
-# print('The answer to part 2: ', ans2)
+print('The answer to part 2: \n')
+print(drawScreen(regx))
