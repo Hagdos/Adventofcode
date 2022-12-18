@@ -128,8 +128,6 @@ def solve(filename, n):
     jetsgen = initjetsgen(filename)
     seen = dict()
 
-    repetition = False
-
     blocks = 0
     dheight = 0
     while blocks<n:
@@ -147,7 +145,6 @@ def solve(filename, n):
                 if state in seen:
                     dblocks = blocks - seen[state][0]
                     dheight = highestpoint - seen[state][1]
-                    repetition = True
 
                     repetitions = (n - blocks)//dblocks
                     dheight *= repetitions
