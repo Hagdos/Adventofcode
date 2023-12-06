@@ -7,8 +7,8 @@ import webbrowser
 # year = input('Year: ')
 # day = input('Day: ')
 
-year = 2022
-day = 1
+year = 2023
+day = 6
 
 path = str(year) + '/Day ' + str(day)
 url = 'https://adventofcode.com/' + str(year) + '/day/' + str(day)
