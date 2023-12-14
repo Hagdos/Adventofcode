@@ -46,19 +46,7 @@ patterns.append(np.array(pattern))
 
 
 for pattern in patterns:
-    # print(pattern)
-    # horizontal = findMirror(pattern)*100
-    # if horizontal:
-    #     ans1 += horizontal
-    # else:
-    #     ans1 += findMirror(np.rot90(pattern, -1))
     ans1 += findMirror(pattern)*100 + findMirror(np.rot90(pattern, -1))
-
-    # horizontal = findMirror2(pattern)*100
-    # if horizontal:
-    #     ans2 += horizontal
-    # else:
-    #     ans2 += findMirror2(np.rot90(pattern, -1))
     ans2 += findMirror2(pattern)*100 + findMirror2(np.rot90(pattern, -1))
 
 
