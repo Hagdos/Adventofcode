@@ -1,5 +1,7 @@
-def move(location, direction):
-    return ((location[0]+direction[0], location[1]+direction[1]))
+from collections import defaultdict
+
+def move(location, direction, length=1):
+    return ((location[0]+direction[0]*length, location[1]+direction[1]*length))
 
 def drawMap(dug, filename = "map.txt"):
     f = open(filename, "w")
@@ -48,11 +50,9 @@ def readhex(hexcode):
 
     return distance, d
 
-file = open('input.txt').readlines()
+file = open('Day 18/input.txt').readlines()
 
 instructions = [x.strip().split() for x in file]
-
-ans1 = ans2 = 0
 
 direction = {'U': (-1, 0),
              'D': (1, 0),
@@ -67,6 +67,10 @@ direction2 = {3: (-1, 0),
 position = (0,0)
 dug = set([position])
 
+position2 = (0,0)
+corners = {position2}
+relevantrows = set()
+
 for command, length, colour in instructions:
     d = direction[command]
     for _ in range(int(length)):
@@ -74,18 +78,42 @@ for command, length, colour in instructions:
         dug.add(position)
 
     length2, d2 = readhex(colour)
+    position2 = move(position2, d2, length2)
+    corners.add(position2)
+    relevantrows.add(position2[0])
 
-    print(length2/int(length), d, d2)
-
-
-drawMap(dug)
-# dug = floodfill(dug, (1, 1))
-
-
+dug = floodfill(dug, (1, 1))
 print('The answer to part 1: ', len(dug))
-print('The answer to part 2: ', ans2)
+position = (0,0)
+walls = defaultdict(list)
+
+for _, _, colour in instructions:
+    length, d = readhex(colour)
+    newposition = move(position, d, length)
+    if d2 in [(-1, 0), (1, 0)]:
+        for r in relevantrows:
+            if min(position[0],newposition[0]) <= r <= max(position[0], newposition[0]):
+                walls[r].append(newposition[1])     # Walls inclused corners
+    position = newposition
+
+ans2 = 0
+for r in sorted(relevantrows):
+    if ranges:
+        ans2
+    outside = True
+    for wall in sorted(walls[r]):
+
+    print(r)
+
+print('The answer to part 2: ', len(corners))
+
+
 
 # Rough idea:
-    # First only store the corners, and make a list of rows that have corners.
+    # First only store the corners, and make a list of rows that have corners
+
+# There are multiple rows that have 4 corners, some even have 6
     # Then iterate the instructions, and make a list of vertical wall units for the rows that have a corner (Only vertical! But including the corners)
     # Then for each row, calculate the width between vertical wall units, and multiply it with the height between rows
+    # To calculate width: Start counting at every wall, stop counting at every wall. Corners always come in pairs: If outside take the first corner, if inside take the second corner
+    # Assert if corners really come in pairs?
