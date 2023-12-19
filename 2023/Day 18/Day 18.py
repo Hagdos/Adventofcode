@@ -50,7 +50,80 @@ def readhex(hexcode):
 
     return distance, d
 
-file = open('Day 18/input.txt').readlines()
+def score(walls, r1, r2): # TODO: Startline isn't really needed, we can also add the line score right away whenever there's 2 corners
+    score = 0
+    i = 0
+
+    while i < len(walls):
+        # Find the starting point
+        if (r1, walls[i]) in corners:
+            if corners[(r1, walls[i])] == 'Upper':
+                if corners[(r1, walls[i+1])] == 'Upper':
+                    score += (walls[i+1] - walls[i] + 1) * (r2 - r1)
+                    i += 2
+                    continue
+                elif corners[(r1, walls[i+1])] == 'Lower':
+                    startline = startrange = walls[i]
+                    i += 2
+            elif corners[(r1, walls[i])] == 'Lower':
+                if corners[(r1, walls[i+1])] == 'Upper':
+                    startline = walls[i]
+                    startrange = walls[i+1]
+                    i += 2
+                elif corners[(r1, walls[i+1])] == 'Lower':
+                    score += (walls[i+1] - walls[i] + 1)
+                    i += 2
+                    continue
+            else:
+                raise ValueError
+        else:
+            startline = startrange = walls[i]
+            i += 1
+
+        s, i = findend(walls, r1, r2, startline, startrange, i)
+        # print(s, i)
+        score += s
+
+    return score
+
+def findend(walls, r1, r2, startline, startrange, i):
+    if (r1, walls[i]) in corners:
+        if corners[(r1, walls[i])] == 'Upper':
+            if corners[(r1, walls[i+1])] == 'Upper':
+                range1 = walls[i] - startrange + 1
+                line = walls[i+1] - startline
+                score = line + range1 * (r2-r1-1)
+                i += 2
+                s, i = findend(walls, r1, r2, walls[i-1], walls[i-1], i)
+                score += s
+                return score, i
+            elif corners[(r1, walls[i+1])] == 'Lower':
+                range1 = walls[i] - startrange + 1
+                line = walls[i+1] - startline + 1
+                score = line + range1 * (r2-r1-1)
+                i += 2
+                return score, i
+        elif corners[(r1, walls[i])] == 'Lower':
+            if corners[(r1, walls[i+1])] == 'Upper':
+                line = walls[i+1] - startline + 1
+                range1 = walls[i+1] - startrange + 1
+                score = line + range1 * (r2-r1-1)
+                i += 2
+                return score, i
+            elif corners[(r1, walls[i+1])] == 'Lower':
+                i += 2
+                score, i = findend(walls, r1, r2, startline, startrange, i)
+                return score, i
+        else:
+            raise ValueError
+    else:
+        range1 = walls[i] - startrange + 1
+        line = walls[i] - startline + 1
+        score = line + range1 * (r2-r1-1)
+        i += 1
+        return score, i
+
+file = open('input.txt').readlines()
 
 instructions = [x.strip().split() for x in file]
 
@@ -71,6 +144,8 @@ position2 = (0,0)
 corners = dict()
 relevantrows = set()
 
+part1 = False
+
 for command, length, colour in instructions:
     d = direction[command]
     for _ in range(int(length)):
@@ -78,17 +153,20 @@ for command, length, colour in instructions:
         dug.add(position)
 
     length2, d2 = readhex(colour)
+    if part1:
+        length2, d2 = int(length), d
+
     if d2 == direction['U']:
         corners[position2] = 'Lower'
         position2 = move(position2, d2, length2)
         corners[position2] = 'Upper'
-    elif d2 == direction['L']:
+    elif d2 == direction['D']:
         corners[position2] = 'Upper'
         position2 = move(position2, d2, length2)
         corners[position2] = 'Lower'
     else:
         position2 = move(position2, d2, length2)
-        
+
     relevantrows.add(position2[0])
 
 dug = floodfill(dug, (1, 1))
@@ -96,64 +174,32 @@ print('The answer to part 1: ', len(dug))
 position = (0,0)
 walls = defaultdict(list)
 
-for _, _, colour in instructions:
+for command, l, colour in instructions:
     length, d = readhex(colour)
+    if part1:
+        d = direction[command]
+        length = int(l)
     newposition = move(position, d, length)
-    if d2 in [(-1, 0), (1, 0)]:
+
+    if d in [(-1, 0), (1, 0)]:
         for r in relevantrows:
             if min(position[0],newposition[0]) <= r <= max(position[0], newposition[0]):
                 walls[r].append(newposition[1])     # Walls included corners
     position = newposition
 
 ans2 = 0
-for r in sorted(relevantrows):
-    w = sorted(walls[r])
-    print(w)
-    # i = 0
-    # while i < len(w):
-    #     # The first wall (or corner) is the start of the line and/or block/range
-    #     if (r, w[i]) not in corners:
-    #         startline = startrange = w[i]
-    #     elif corners[(r, w[i])] == 'Upper':
-    #         startline = startrange = w[i]
-    #         if corners[(r, w[i+1])] == 'Lower':
-    #             i += 1 #Skip this "wall"
-    #         # If second corner is also upper, it's an endpoint
-    #     elif corners[(r, w[i])] == 'Lower':
-    #         startline = w[i]
-    #         if corners[(r, w[i+1])] == 'Lower':
-    #             endline = w[i+1] # No range in this case, just the single line
-    #             ans2 += endline-startline+1
-    #             continue
-    #         else:
-    #             i+= 1
-    #             startrange = w[i]
-    #     i += 1
+relevantrows = sorted(relevantrows)
 
-    #     if (r, w[i]) not in corners:
-    #         endline = endrange = w[i]
+for r1, r2 in zip(relevantrows[0:-1], relevantrows[1:]):
 
-    #     elif corners[(r, w[i])] == 'Upper':
-    #         endrange = w[i]
-    #         if corners[(r, w[i+1])] == 'Lower':
-    #             i += 1
-    #             endline= w[i]
-    #         else:
-
-            
+    # print(r1, r2)
+    w = sorted(walls[r1])
+    ans2 += score(w, r1, r2)
 
 
-    print(r)
+# Add the last row
+w = sorted(walls[r2])
+for w1, w2 in zip(w[0:-1:2], w[1::2]):
+    ans2 += w2 - w1 + 1
 
-print('The answer to part 2: ', len(corners))
-
-
-
-# Rough idea:
-    # First only store the corners, and make a list of rows that have corners
-
-# There are multiple rows that have 4 corners, some even have 6
-    # Then iterate the instructions, and make a list of vertical wall units for the rows that have a corner (Only vertical! But including the corners)
-    # Then for each row, calculate the width between vertical wall units, and multiply it with the height between rows
-    # To calculate width: Start counting at every wall, stop counting at every wall. Corners always come in pairs: If outside take the first corner, if inside take the second corner
-    # Assert if corners really come in pairs?
+print('The answer to part 2: ', ans2)
