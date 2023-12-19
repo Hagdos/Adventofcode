@@ -68,7 +68,7 @@ position = (0,0)
 dug = set([position])
 
 position2 = (0,0)
-corners = {position2}
+corners = dict()
 relevantrows = set()
 
 for command, length, colour in instructions:
@@ -78,8 +78,17 @@ for command, length, colour in instructions:
         dug.add(position)
 
     length2, d2 = readhex(colour)
-    position2 = move(position2, d2, length2)
-    corners.add(position2)
+    if d2 == direction['U']:
+        corners[position2] = 'Lower'
+        position2 = move(position2, d2, length2)
+        corners[position2] = 'Upper'
+    elif d2 == direction['L']:
+        corners[position2] = 'Upper'
+        position2 = move(position2, d2, length2)
+        corners[position2] = 'Lower'
+    else:
+        position2 = move(position2, d2, length2)
+        
     relevantrows.add(position2[0])
 
 dug = floodfill(dug, (1, 1))
@@ -93,15 +102,46 @@ for _, _, colour in instructions:
     if d2 in [(-1, 0), (1, 0)]:
         for r in relevantrows:
             if min(position[0],newposition[0]) <= r <= max(position[0], newposition[0]):
-                walls[r].append(newposition[1])     # Walls inclused corners
+                walls[r].append(newposition[1])     # Walls included corners
     position = newposition
 
 ans2 = 0
 for r in sorted(relevantrows):
-    if ranges:
-        ans2
-    outside = True
-    for wall in sorted(walls[r]):
+    w = sorted(walls[r])
+    print(w)
+    # i = 0
+    # while i < len(w):
+    #     # The first wall (or corner) is the start of the line and/or block/range
+    #     if (r, w[i]) not in corners:
+    #         startline = startrange = w[i]
+    #     elif corners[(r, w[i])] == 'Upper':
+    #         startline = startrange = w[i]
+    #         if corners[(r, w[i+1])] == 'Lower':
+    #             i += 1 #Skip this "wall"
+    #         # If second corner is also upper, it's an endpoint
+    #     elif corners[(r, w[i])] == 'Lower':
+    #         startline = w[i]
+    #         if corners[(r, w[i+1])] == 'Lower':
+    #             endline = w[i+1] # No range in this case, just the single line
+    #             ans2 += endline-startline+1
+    #             continue
+    #         else:
+    #             i+= 1
+    #             startrange = w[i]
+    #     i += 1
+
+    #     if (r, w[i]) not in corners:
+    #         endline = endrange = w[i]
+
+    #     elif corners[(r, w[i])] == 'Upper':
+    #         endrange = w[i]
+    #         if corners[(r, w[i+1])] == 'Lower':
+    #             i += 1
+    #             endline= w[i]
+    #         else:
+
+            
+
 
     print(r)
 
