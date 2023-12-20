@@ -17,8 +17,62 @@ def workflow(part, flow):
             return workflow(part, rule[0])
 
 
+def calcScore(partranges):
+    score = 1
+    for param in partranges.values():
+        length = param[1]-param[0]
+        score *= length
+    return score
 
-file = open('input.txt').read()
+def fullflow(partranges, flow):
+
+    global flows
+    if flow == 'A':
+        return calcScore(partranges)
+    elif flow == 'R':
+        return 0
+    
+    score = 0
+    for rule in flows[flow]:
+        if len(rule) == 2:
+            parametername = rule[0][0] # This is 'x', 'm', 'a' or 's'
+            partrange = partranges[parametername]
+            rulevalue = int(rule[0][2:])
+
+            if rule[0][1] == '<':
+                split = rulevalue
+                if split <= partrange[0]:
+                    continue
+                elif partrange [0] < split < partrange[1]:
+                    newpartrange = [partrange[0], split]
+                    newpartranges = partranges.copy()
+                    newpartranges[parametername] = newpartrange
+                    score += fullflow(newpartranges, rule[1])
+                    partranges[parametername] = [split, partrange[1]]
+                    continue
+                else:
+                    score += fullflow(partranges, rule[1])
+                    return score
+                     
+            if rule[0][1] == '>':
+                split = rulevalue + 1
+                if split >= partrange[1]:
+                    continue
+                elif partrange[0] < split < partrange[1]:
+                    newpartrange = [split, partrange[1]]
+                    newpartranges = partranges.copy()
+                    newpartranges[parametername] = newpartrange
+                    score += fullflow(newpartranges, rule[1])
+                    partranges[parametername] = [partrange[0], split]
+                    continue
+                else:
+                    score += fullflow(partranges, rule[1])
+                    return score
+        elif len(rule) == 1:
+            score += fullflow(partranges, rule[0])
+            return score
+
+file = open('Day 19/input.txt').read()
 
 ans1 = ans2 = 0
 
@@ -43,6 +97,15 @@ for p in parts:
     if accepted:
         ans1 += sum(part.values())
 
-
 print('The answer to part 1: ', ans1)
-print('The answer to part 2: ', ans2)
+
+# Use non-inclusive ranges (start included, end not included, like range())
+partranges = {'x': (1, 4001),
+              'm': (1, 4001),
+              'a': (1, 4001),
+              's': (1, 4001),
+              }
+
+print('The answer to part 2: ', fullflow(partranges, 'in'))
+
+# 95911175491896 is too low
