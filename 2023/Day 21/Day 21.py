@@ -1,9 +1,26 @@
+def dijkstra(start):
+    visited = {start: 0}
+    edge = [(start, 0)]
+
+    while edge:
+        node, distance = edge.pop(0)
+        newnodes = findNeighbours(node)
+
+        for new in newnodes:
+            if new not in visited or distance+1 < visited[new]:
+                visited[new] = distance+1
+                edge.append((new, distance+1))
+
+    return visited
+
+
 def findNeighbours(location):
     r, c = location
     neighbours = []
     for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
         if (r+dr, c+dc) not in rocks:
-            neighbours.append((r+dr, c+dc))
+            if 0 <= r+dr < SIZE and 0 <= c+dc < SIZE:
+                neighbours.append((r+dr, c+dc))
     return neighbours
 
 def findNeighbours2(location):
@@ -20,7 +37,7 @@ def findNeighbours2(location):
 file = open('input.txt').readlines()
 
 data = [x.strip() for x in file]
-ans1 = ans2 = 0
+SIZE = len(data)
 
 rocks = set()
 
@@ -46,23 +63,21 @@ print('The answer to part 1: ', len(positions))
 
 # Part 2
 
-positions = findNeighbours(start)
-n = 1165
-visited = set()
+corners = [(0, 0), (0, SIZE-1), (SIZE-1, SIZE-1), (SIZE-1, 0)]      # Every opposing corner/wall is always 2 steps away
+walls = [(0, 65), (65, 0), (SIZE-1, 65), (65, SIZE-1)]
 
-for _ in range((n-1)//2):
-    edge = []
-    for p in positions:
-        newpositions = findNeighbours2(p)
-        for n in newpositions:
-            if n not in visited:
-                visited.add(n)
-                edge.append(n)
+distancemaps = {p: dijkstra(p) for p in corners+walls}
 
-    positions = edge.copy()
+totalsteps = 26501365
+
+for point in distancemaps[corners[0]]: # It doesn't matter which distancemaps, we just need all point that are not rocks
+    for i in range(4):
+        # Iterate over all walls and corners
+        dpoint = distancemaps[walls[i]][point] # Distance point2wall
+        spoint = distancemaps[walls[i-2]][start] # Distance start2wall (opposite)
 
 
-print('The answer to part 2: ', len(visited))
+# print('The answer to part 2: ', len(visited))
 
 # Checkable answers:
 # 64 steps = 3748
