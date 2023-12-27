@@ -10,7 +10,7 @@ class ingredient:
 
     def __repr__(self):
         return self.name
-    
+
 text = open('input.txt')
 pt2 = True
 
@@ -26,7 +26,7 @@ for sugar in range(101):
         for candy in range(101-sugar-sprinkles):
             chocolate = 100-sugar-sprinkles-candy
             recipes.append((sugar,sprinkles,candy,chocolate))
-maxscore = 0         
+maxscore = 0
 for recipe in recipes:
     capacity = 0
     durability = 0
@@ -39,9 +39,9 @@ for recipe in recipes:
         flavor      += ingredients[i].flavor*n
         texture     += ingredients[i].texture*n
         calories    += ingredients[i].calories*n
-    if calories != 500:
-        score = 0
-    elif capacity < 0 or durability < 0 or flavor < 0 or texture < 0:
+    # if calories != 500:
+    #     score = 0
+    if capacity < 0 or durability < 0 or flavor < 0 or texture < 0:
         score = 0
     else:
         score = capacity * durability * flavor * texture
@@ -49,5 +49,5 @@ for recipe in recipes:
         maxscore = score
         bestrecipe = recipe
         bestcapacity = capacity
- 
+
 print('Answer to part 1:', maxscore)

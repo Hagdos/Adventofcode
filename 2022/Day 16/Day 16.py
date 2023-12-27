@@ -34,7 +34,6 @@ def removeHalls(neighbours, valveflows):
 def findPaths(start):
     # create empty queues
     distance = dict()
-    prev = dict()
     Queue = []
     for n in neighbours:
         distance[n] = 10000
@@ -111,12 +110,14 @@ while(paths):
     c += 1
 
     path = paths.pop(0)
-    visited.append(path)
+
 
     options = nextSteps(path)
     for o in options:
         # if checkPath(o): # Checkpath seems to make it run much much longer...
         paths.append(o)
+    if not options:
+        visited.append(path)
 
 ans1 = 0
 for v in visited:
@@ -129,42 +130,47 @@ print(f'The answer to part 1: {ans1}')
 print(winpath)
 
 
+# visited.sort(key=lambda a:a[-1], reverse=True)
+
+
 # Part 2: Seems like it can be split: The winning path for 30/26 seems to be straight from AA to JY with all nodes in between.
 # So the elephant should take the best path that doesn't involve these nodes.
 
 # Run the same thing again; without the nodes in winpath.
 
-for n in neighbours:
-    for r in winpath[0]:
-        if r in neighbours[n]:
-            neighbours[n].pop(r)
+# for n in neighbours:
+#     for r in winpath[0]:
+#         if r in neighbours[n]:
+#             neighbours[n].pop(r)
 
 
-startpath = [['AA'], 0, 0]
-paths = [startpath]
-visited = []
-solutions = []
-c = 0
+# startpath = [['AA'], 0, 0]
+# paths = [startpath]
+# visited = []
+# solutions = []
+# c = 0
 
-while(paths):
-    c += 1
+# while(paths):
+#     c += 1
 
-    path = paths.pop(0) # Unsorted?
-    visited.append(path)
+#     path = paths.pop(0) # Unsorted?
+#     visited.append(path)
 
-    options = nextSteps(path)
-    for o in options:
-        # if checkPath(o): # Checkpath seems to make it run much much longer...
-        paths.append(o)
+#     options = nextSteps(path)
+#     for o in options:
+#         # if checkPath(o): # Checkpath seems to make it run much much longer...
+#         paths.append(o)
 
 
 
-ans2 = 0
-for v in visited:
-    if v[1] == ['AA', 'MC']:
-        print(v)
-    if v[2] > ans2:
-        ans2 = max(ans2, v[2])
-        winpath = v
-print(f'The answer to part 2: {ans1+ans2}')
-print(winpath)
+# ans2 = 0
+# for v in visited:
+#     if v[1] == ['AA', 'MC']:
+#         print(v)
+#     if v[2] > ans2:
+#         ans2 = max(ans2, v[2])
+#         winpath = v
+# print(f'The answer to part 2: {ans1+ans2}')
+# print(winpath)
+
+

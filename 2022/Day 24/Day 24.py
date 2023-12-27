@@ -9,7 +9,6 @@ def readInput(filename):
             if char in charToDirection:
                 blizzards[charToDirection[char]].add((r, c))
 
-    # TODO fix this; hinges on the input not having a newline at the end...
     size = ((0, r), (0, c))
 
     return blizzards, size
