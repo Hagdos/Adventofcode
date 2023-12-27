@@ -23,17 +23,6 @@ def findNeighbours(location):
                 neighbours.append((r+dr, c+dc))
     return neighbours
 
-def findNeighbours2(location):
-    r, c = location
-    neighbours = set()
-    for dr, dc in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-        if (r+dr, c+dc) not in rocks:
-            for dr2, dc2 in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
-                if (r+dr+dr2, c+dc+dc2) not in rocks:
-                    neighbours.add((r+dr+dr2, c+dc+dc2))
-
-    return neighbours
-
 file = open('input.txt').readlines()
 
 data = [x.strip() for x in file]
@@ -50,16 +39,14 @@ for r, line in enumerate(data):
 
 positions = set([start])
 
-# 26501365
+distancefromstart = dijkstra(start)
+ans1 = 0
+for point in distancefromstart:
+    if distancefromstart[point] <= 64:
+        if not distancefromstart[point]%2:
+            ans1 += 1
 
-for _ in range(64):
-    newpositions = set()
-    for p in positions:
-        newpositions.update(findNeighbours(p))
-    positions = newpositions
-
-
-print('The answer to part 1: ', len(positions))
+print('The answer to part 1: ', ans1)
 
 # Part 2
 
@@ -69,38 +56,31 @@ walls = [(0, 65), (65, 0), (SIZE-1, 65), (65, SIZE-1)]
 distancemaps = {p: dijkstra(p) for p in corners+walls}
 
 totalsteps = 26501365
-
+ans2 = 0
 for point in distancemaps[corners[0]]: # It doesn't matter which distancemaps, we just need all point that are not rocks
+    if distancefromstart[point]%2:
+        ans2 += 1
+
     for i in range(4):
-        # Iterate over all walls and corners
+        # Iterate over all walls
         dpoint = distancemaps[walls[i]][point] # Distance point2wall
         spoint = distancemaps[walls[i-2]][start] # Distance start2wall (opposite)
 
+        if dpoint % 2: # If odd
+            ans2 += (totalsteps - dpoint - spoint - 1)//(2*SIZE) + 1
+        else:
+            ans2 += (totalsteps - dpoint - spoint - 1 + SIZE)//(2*SIZE)
 
-# print('The answer to part 2: ', len(visited))
+        # Iterate over all corners
+        dpoint = distancemaps[corners[i]][point] # Distance point2wall
+        spoint = distancemaps[corners[i-2]][start] # Distance start2wall (opposite)
 
-# Checkable answers:
-# 64 steps = 3748
-# 65 steps = 3787
-
-
-# There is a free path along the border, as well as along the middle (r = 65 and c = 65)
-# Height == width = 131
-
-# For each point in the map, calculate the distance to each corner and to the middle of each side.
-    # This may be easier the other way around; calc the distance from the corner and middle to each side.
-
-# For each point in the map, count in how many maps it is reachable in each direction.
-# It's reachable if totalsteps <= start2side + side2point + nmaps*131 AND start2side + side2point + nmaps*131 is odd
-# nmaps is the amount of nmaps in between. 0 is the map directly adjacent (including corners)
-
-# For the sides, every nmaps that fulfills the requirements is +1 reachable garden (don't forget to include the 0)
-# For the corners every nmaps that fulfills the requiremetns is +nmaps+1 reachable garden
+        if dpoint % 2: # If odd
+            n = (totalsteps - dpoint - spoint - 2)//(2*SIZE) + 1
+            ans2 += n**2
+        else:
+            n = (totalsteps - dpoint - spoint - 2 + SIZE)//(2*SIZE)
+            ans2 += n*(n+1)
 
 
-# Part 2 ideas: If i can get there in range-2*n steps, I can get there in range steps (by going back and forth between neighbours)
-# If I can get there in an even number of steps, I can never ever get there in an odd number of steps (end goal)
-
-# So what I can do is increase the stepsize to 2, and don't look at already visited nodes.
-
-# To check rocks outside the original graph, use (r+dr)%rowlength (probably + 2 or something for the edges inbetween)
+print('The answer to part 2: ', ans2)

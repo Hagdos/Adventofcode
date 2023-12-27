@@ -1,4 +1,4 @@
-import time
+    import time
 
 def moveNorth(rocks, cubes):
     newrocks = set()
@@ -58,7 +58,7 @@ def runcycle(rocks, cubes, size):
 
     return rocks, cubes
 
-file = open('input.txt').readlines()
+file = open('input_harder.txt').readlines()
 
 data = [x.strip() for x in file]
 ans1 = ans2 = 0
@@ -92,10 +92,6 @@ for i in range(cycles):
     rocks, cubes = runcycle(rocks, cubes, size)
 
     print(f'Cycle #: {i}, {time.time()-start}, Score: {countScore(rocks, size)}')
-    # start = time.time()
-
-    # if i > 80000:
-    # printPlatform(rocks, cubes, size)
 
     t = tuple(rocks)
     if t in seen.keys():
