@@ -1,12 +1,5 @@
-def concat(n1, n2):
-    e = 1
-    while n2 // e != 0:
-        e *= 10
-    return n1 * e + n2
-
-
 def reverseconcat(n1, n2):
-    e = 1
+    e = 10
     while n2 // e != 0:
         e *= 10
 
@@ -15,73 +8,53 @@ def reverseconcat(n1, n2):
     return None
 
 
-# Slow, dumb way to solve it.
-def solve1(data):
-    part2 = True
-    ans = 0
-
-    for eq in data:
-        # print(eq)
-        result = int(eq[0])
-        numbers = [int(i) for i in eq[1].split()]
-
-        results = {numbers[0]}
-
-        for n in numbers[1:]:
-            newresults = set()
-            for r in results:
-                new = r+n
-                if new <= result:
-                    newresults.add(new)
-                new = r*n
-                if new <= result:
-                    newresults.add(new)
-                if part2:
-                    new = concat(r, n)
-                    if new <= result:
-                        newresults.add(new)
-            results = newresults
-
-        if result in results:
-            ans += result
-
-    return ans
-
-
 # Faster way to solve it, going from the result on backwards and only allowing
 # moves that are possible
-def solve2(data):
-    part2 = True
-    ans = 0
+def checkEquation(eq, pt2):
+    result = int(eq[0])
+    numbers = [int(i) for i in eq[1].split()]
+
+    results = {result}
+
+    for n in numbers[::-1]:
+        newresults = set()
+        for r in results:
+            if r - n >= 0:
+                newresults.add(r-n)
+            if n != 0 and r % n == 0:
+                newresults.add(r//n)
+            if pt2:
+                new = reverseconcat(r, n)
+                if new:
+                    newresults.add(new)
+
+        results = newresults
+
+    if 0 in results:
+        return result
+    return 0
+
+
+def solve(data):
+    ans1 = ans2 = 0
 
     for eq in data:
-        result = int(eq[0])
-        numbers = [int(i) for i in eq[1].split()]
+        s = checkEquation(eq, False)
+        if s:
+            ans1 += s
+            ans2 += s # If it's true for part 1, it's also true for part 2.
+        else:
+            ans2 += checkEquation(eq, True)
 
-        results = {result}
-
-        for n in numbers[::-1]:
-            newresults = set()
-            for r in results:
-                if r - n >= 0:
-                    newresults.add(r-n)
-                if r % n == 0:
-                    newresults.add(r//n)
-                if part2:
-                    new = reverseconcat(r, n)
-                    if new:
-                        newresults.add(new)
-
-            results = newresults
-
-        if 0 in results:
-            ans += result
-
-    return ans
+    return ans1, ans2
 
 
-file = open('input.txt').readlines()
+# file = open('input.txt').readlines()
+file = open('aoc-2024-day-07-challenge-1.txt').readlines()
 
 data = [x.strip().split(": ") for x in file]
 
-print(f'The answer:  {solve1(data)}\nOr Possibly: {solve2(data)}')
+ans1, ans2 = solve(data)
+
+print(f'The answer to part 1:  {ans1}')
+print(f'The answer to part 2:  {ans2}')
