@@ -16,9 +16,12 @@ def checkEquation(eq, pt2):
 
     results = {result}
 
-    for n in numbers[::-1]:
+    for i in range(len(numbers)-1, 0, -1):
+        n = numbers[i]
         newresults = set()
         for r in results:
+            if n == 0 and r == 0:
+                return result
             if r - n >= 0:
                 newresults.add(r-n)
             if n != 0 and r % n == 0:
@@ -30,7 +33,7 @@ def checkEquation(eq, pt2):
 
         results = newresults
 
-    if 0 in results:
+    if numbers[0] in results:
         return result
     return 0
 
@@ -42,7 +45,7 @@ def solve(data):
         s = checkEquation(eq, False)
         if s:
             ans1 += s
-            ans2 += s # If it's true for part 1, it's also true for part 2.
+            ans2 += s  # If it's true for part 1, it's also true for part 2.
         else:
             ans2 += checkEquation(eq, True)
 
@@ -50,7 +53,7 @@ def solve(data):
 
 
 # file = open('input.txt').readlines()
-file = open('aoc-2024-day-07-challenge-1.txt').readlines()
+file = open('aoc-2024-day-07-challenge-3.txt').readlines()
 
 data = [x.strip().split(": ") for x in file]
 
