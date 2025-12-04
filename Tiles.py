@@ -46,6 +46,12 @@ class Tiles:
             if self.in_range(step):
                 yield step
 
+    def get_eight_neighbours(self, pos):
+        for d in [(-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1)]:
+            step = self.step(pos, d)
+            if self.in_range(step):
+                yield step
+
     # Manhattan distance
     def distance(self, pos1, pos2):
         return abs(pos1[0]-pos2[0]) + abs(pos1[1]-pos2[1])
