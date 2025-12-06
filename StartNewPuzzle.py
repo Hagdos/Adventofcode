@@ -7,7 +7,7 @@ import webbrowser
 # year = input('Year: ')
 # day = input('Day: ')
 
-year = 2023
+year = 2025
 day = 6
 
 path = str(year) + '/Day ' + str(day)
@@ -19,8 +19,8 @@ if os.path.isdir(path):
 else:
     # Read input data from HTTP
     inputrequest = Request(inputurl)
-    inputrequest.add_header('Cookie', 'session=53616c7465645f5fd1b146368a0b6a068fac2305df80be44e853f28e44defdf3b35cc7b49825406191bc263d8dab3b8370403074e32fe9e25b39a4496f974a0b')
-    inputrequest.add_header('github.com/Hagdos/Adventofcode by yourname@example.com')
+    inputrequest.add_header('Cookie', 'session=')
+    inputrequest.add_header('User-Agent', 'github.com/Hagdos/Adventofcode by tomkooyman@gmail.com')
     puzzleInput = urlopen(inputrequest).read()
 
     # Write input data to input.txt
