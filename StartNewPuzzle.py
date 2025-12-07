@@ -31,12 +31,14 @@ else:
 
     #Create python file
     pythonFile = open(path + '/Day ' + str(day) + '.py', 'w')
-    pythonFile.write('file = open(\'input.txt\').readlines()\n\n')
+    pythonFile.write('import pyperclip\n\n')
+    pythonFile.write(f'file = open(\'{path}/input.txt\').readlines()\n\n')
     pythonFile.write('data = [x.strip().split() for x in file]\n')
     pythonFile.write('print(data)\n')
     pythonFile.write('ans1 = ans2 = 0\n\n')
     pythonFile.write('print(\'The answer to part 1: \', ans1)\n')
     pythonFile.write('print(\'The answer to part 2: \', ans2)\n')
+    pythonFile.write('pyperclip.copy(ans1)')
     pythonFile.close()
 
     webbrowser.open(url)
