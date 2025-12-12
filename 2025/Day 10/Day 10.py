@@ -116,10 +116,8 @@ def back_substitute_row(M, button_presses):
         return back_substitute_row(M[:-1], button_presses+[B//row[-end]])
 
     else:
-        # Stay on the same row. Append any feasible number to button_presses; and find the lowest solution
-        max_button_presses = abs(B//row[-end]) # This is not the theoretical maximum; as other values could be negative.
         best = large_value
-        for n in range(max_button_presses+random_additor): 
+        for n in range(s): # The number of button presses should never be more than the answer s we're looking for in this iteration.
             a = back_substitute_row(M, button_presses+[n]) 
             if a < best:
                 best = a
@@ -130,15 +128,9 @@ start = time.time()
 file = open('2025/Day 10/input.txt').readlines()
 ans1 = ans2 = 0
 
-# Todo: Find a better fix for this random additor.
-random_additor = 5 # 21494
-random_additor = 30 # 21469
-# random_additor = 100 # 21469
-# random_additor = 500 # 21469
 large_value = 1000000
 
 for line in file[:]: 
-    print(line)
     line = line.split()
     lights = [c == '#' for c in line[0][1:-1]]
     buttons = list(set(int(i) for i in b[1:-1].split(',') )for b in line[1:-1])
@@ -150,25 +142,27 @@ for line in file[:]:
 
     N = [r.copy() for r in M]
     triangleM=gaussian_elimination(N)
-    print_matrix(triangleM)
+    # print_matrix(triangleM)
 
     # Add another equation: The sum of all button presses should be answer (as low as possible)
     # The first sum s that returns an answer is the lowest answer
-    s = max(joltage)-1 # The amount of presses needed will never be less than the lowest joltage
+    s = max(joltage) # The amount of presses needed will never be less than the highest joltage (as the increments are never more than 1 per button)
     M.append([1]*(len(M[0])-1)+[s])
     r = large_value
     while r == large_value:
-        s += 1
         M[-1][-1] = s
         N = [r.copy() for r in M]
         triangleM=gaussian_elimination(N)
         r=back_substitute_row(triangleM, [])
+        s += 1
 
     ans2 += r
-    print(r)
 
 
 print('The answer to part 1: ', ans1)
 print('The answer to part 2: ', ans2)
 print(f'{time.time()-start} seconds to run')
 pyperclip.copy(ans2)
+
+
+# Todo; find a cleaner way to find a valid value for random_additor?
