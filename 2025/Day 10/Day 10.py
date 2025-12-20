@@ -1,6 +1,5 @@
-import pyperclip
+#import pyperclip
 import time
-import itertools
 
 def press_button(lights, button):
     l = lights.copy()
@@ -22,28 +21,6 @@ def switch_indicators(lights, buttons):
     a2 = switch_indicators(lights, buttons[1:]) + 1
 
     return min(a1, a2)
-
-def switch_joltage(joltage, buttons):
-    # This method works; but is insanely slow.
-    if not any(joltage):
-        return 0                # Check if joltage is 0 for all numbers
-
-    if not buttons:
-        return 1000000
-
-    print(buttons)
-
-    best = switch_joltage(joltage, buttons[1:])
-
-    presses = 0
-    while all(j>=0 for j in joltage):
-        presses += 1
-        # Press the button once; and try
-        joltage = [j-1 if i in buttons[0] else j for i,j in enumerate(joltage)]
-        best = min(best, switch_joltage(joltage, buttons[1:])+presses)
-
-    return best
-
 
 def print_matrix(M):
     for row in M:
@@ -126,7 +103,7 @@ def back_substitute_row(M, button_presses):
 
 start = time.time()
 file = open('2025/Day 10/input.txt').readlines()
-ans1 = ans2 = 0
+ans1 = ans2 = ans3 = 0
 
 large_value = 1000000
 
@@ -137,32 +114,40 @@ for line in file[:]:
     joltage = [int(i) for i in line[-1][1:-1].split(',')]
 
     ans1 += switch_indicators(lights, buttons)
-    
+
     M=create_matrix(buttons, joltage)
+    M=gaussian_elimination(M)
 
-    N = [r.copy() for r in M]
-    triangleM=gaussian_elimination(N)
-    # print_matrix(triangleM)
 
-    # Add another equation: The sum of all button presses should be answer (as low as possible)
-    # The first sum s that returns an answer is the lowest answer
-    s = max(joltage) # The amount of presses needed will never be less than the highest joltage (as the increments are never more than 1 per button)
-    M.append([1]*(len(M[0])-1)+[s])
-    r = large_value
-    while r == large_value:
-        M[-1][-1] = s
-        N = [r.copy() for r in M]
-        triangleM=gaussian_elimination(N)
-        r=back_substitute_row(triangleM, [])
-        s += 1
+    #Remove empty rows:
+    while not any(M[-1]):
+        M = M[:-1]
 
-    ans2 += r
+    print("Matrix:")
+    print_matrix(M)
+
+    # Only do this thing below if the guessing is required. It's directly solvable if len(M) == len(M[0]) and M[-1] isn't all zeroes.
+    if len(M) == len(M[0])-1: # If the set of equations is complete (Or overdefined); solve equation.
+        ans2 += back_substitute_row(M, [])
+    else:
+        # Add another equation: The sum of all button presses should be answer (as low as possible)
+        # The first sum s that returns an answer is the lowest possible answer
+        s = max(joltage) # The amount of presses needed will never be less than the highest joltage (as the increments are never more than 1 per button)
+        M.append([1]*(len(M[0])-1)+[s])
+        r = large_value
+        while r == large_value:
+            M[-1][-1] = s
+            N = [r.copy() for r in M]
+            triangleM=gaussian_elimination(N)
+            r=back_substitute_row(triangleM, [])
+            s += 1
+        
+        ans2 += r
 
 
 print('The answer to part 1: ', ans1)
 print('The answer to part 2: ', ans2)
 print(f'{time.time()-start} seconds to run')
-pyperclip.copy(ans2)
+#pyperclip.copy(ans2)
 
-
-# Todo; find a cleaner way to find a valid value for random_additor?
+# Ans2 = 21469; runs in 7.8seconds
