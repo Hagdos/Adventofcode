@@ -1,6 +1,7 @@
 import heapq as hq
 
-
+# Definition of a tile:
+# (row, column)
 class Tiles:
     def __init__(self, data=None, size=[10, 10]):
         if data:
