@@ -9,7 +9,7 @@ class BinaryTreeNode:
 
     def add(self, value):
         self.size += 1
-        if self.value:
+        if self.value != None:
             if value > self.value:
                 self.right.add(value)
             elif value < self.value:
@@ -22,7 +22,7 @@ class BinaryTreeNode:
             self.right = BinaryTreeNode()
 
     def position(self, value):
-        if self.value:
+        if self.value != None:
             if value < self.value - self.left.size:
                 return self.left.position(value) 
             else:
@@ -32,7 +32,7 @@ class BinaryTreeNode:
             return 0
 
     def returnsorted(self):
-        if self.value:
+        if self.value != None:
             l = self.left.returnsorted() if self.left.value else []
             r = self.right.returnsorted() if self.right.value else []
             return l + [self.value] + r
@@ -57,5 +57,3 @@ for step in steps[:]:
 print('The answer to part x: ', hashlib.sha256(ans1.encode("utf-8")).hexdigest())
 print('The answer to part 1: ', 'd93801e79cfa9bd23f0402a6cb475cecc7a5a2c3d8b256daf8227bff465fae26')
 print('The answer to part 2: ', '78dd4357d2a9bf009290c5c318ce51217b25220cc50f2922ce6357358c1e727d')
-
-# This works on part 1; but not on part 2...
